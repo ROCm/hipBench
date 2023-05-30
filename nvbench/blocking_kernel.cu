@@ -62,6 +62,7 @@ __global__ void block_stream(const volatile nvbench::int32_t *flag,
                              volatile nvbench::int32_t *timeout_flag,
                              nvbench::float64_t timeout)
 {
+  using namespace cuda::std::chrono;
   const auto start_point = cuda::std::chrono::high_resolution_clock::now();
   const auto timeout_ns =
     cuda::std::chrono::nanoseconds(static_cast<nvbench::int64_t>(timeout * 1e9));

@@ -188,7 +188,8 @@ struct device_info
   /// @return The available amount of shared memory in bytes per SM.
   [[nodiscard]] std::size_t get_shared_memory_per_sm() const
   {
-    return m_prop.sharedMemPerMultiprocessor;
+    /*Todo(HIP): m_prop.sharedMemPerMultiprocessor*/
+    return m_prop.sharedMemPerBlock * 32;
   }
 
   /// @return The available amount of shared memory in bytes per block.

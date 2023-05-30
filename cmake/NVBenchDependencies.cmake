@@ -78,8 +78,7 @@ rapids_find_package(CUDAToolkit REQUIRED
 )
 
 # Append CTK targets to this as we add optional deps (NMVL, CUPTI, ...)
-set(ctk_libraries CUDA::toolkit)
-
+set(ctk_libraries hip::host)
 ################################################################################
 # CUDAToolkit -> NVML
 if (NVBench_ENABLE_NVML)

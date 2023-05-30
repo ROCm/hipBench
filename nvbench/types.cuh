@@ -40,7 +40,7 @@
 // SOFTWARE.
 
 #pragma once
-
+#include <nvbench/cuda_runtime_api.h> // NOTE(HIP): Resolves error: unknown type name '__forceinline__'
 #include <cstdint>
 
 namespace nvbench

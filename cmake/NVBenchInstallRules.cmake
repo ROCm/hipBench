@@ -33,6 +33,15 @@ if(NVBench_ENABLE_INSTALL_RULES)
       PATTERN "internal" EXCLUDE
   )
 
+  # NOTE(HIP): We need to copy these headers to install directory 
+  # to avoid test nvbench.test.cmake.test_export.install_tree from failing
+  install(
+    FILES
+      "${NVBench_SOURCE_DIR}/nvbench/cuda_runtime.h"
+      "${NVBench_SOURCE_DIR}/nvbench/cuda_runtime_api.h"
+    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/nvbench"
+  )
+
   # generated headers from build dir:
   install(
     FILES

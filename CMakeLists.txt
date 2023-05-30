@@ -23,6 +23,9 @@
 # 3.23.1 required for rapids-cmake
 cmake_minimum_required(VERSION 3.23.1)
 
+# NOTE(HIP/AMD): make *.cu files HIP lang files
+set(CMAKE_USER_MAKE_RULES_OVERRIDE "${CMAKE_CURRENT_LIST_DIR}/overrides.cmake")
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CUDA_STANDARD 17)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
@@ -37,7 +40,7 @@ include(cmake/NVBenchRapidsCMake.cmake)
 nvbench_load_rapids_cmake()
 
 project(NVBench
-  LANGUAGES CUDA CXX
+  LANGUAGES CXX HIP
   VERSION 0.1.0
 )
 

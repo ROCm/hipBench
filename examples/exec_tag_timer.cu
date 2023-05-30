@@ -26,7 +26,7 @@
 #include <thrust/execution_policy.h>
 #include <thrust/device_vector.h>
 #include <thrust/sequence.h>
-
+#include <thrust/execution_policy.h>
 // mod2_inplace performs an in-place mod2 over every element in `data`. `data`
 // is reset to `input` each iteration. A manual timer is requested by passing
 // `nvbench::exec_tag::timer` to `state.exec(...)`, which is used to only time
