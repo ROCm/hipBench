@@ -120,6 +120,11 @@ struct device_info
 
   /// @return The SM version of the current device as (major*100) + (minor*10).
   [[nodiscard]] int get_sm_version() const { return m_prop.major * 100 + m_prop.minor * 10; }
+  
+#if defined(__HIP_PLATFORM_AMD__)
+  /// @return The CU architecture of the current device.
+  [[nodiscard]] const char* get_cu_archname() const { return m_prop.name; }
+#endif
 
   /// @return The PTX version of the current device, e.g. sm_80 returns 800.
   [[nodiscard]] __forceinline__ int get_ptx_version() const
@@ -132,12 +137,26 @@ struct device_info
   { // kHz -> Hz
     return static_cast<std::size_t>(m_prop.clockRate * 1000);
   }
+  
+#if defined(__HIP_PLATFORM_AMD__)
+  /// @return The CU architecture of the current device.
+  /// @return The max clock rate of the CU in Hz.
+  [[nodiscard]] std::size_t get_cu_max_clock_rate() const
+  { // kHz -> Hz
+    return static_cast<std::size_t>(m_prop.clockRate * 1000);
+  }
+#endif
 
   /// @return The number of physical streaming multiprocessors on this device.
   [[nodiscard]] int get_number_of_sms() const { return m_prop.multiProcessorCount; }
 
+#if defined(__HIP_PLATFORM_AMD__) 
+  /// @return The maximum number of resident blocks per CU.
+  [[nodiscard]] int get_max_blocks_per_cu() const { return m_prop.maxThreadsPerMultiProcessor/m_prop.warpSize; }
+#else
   /// @return The maximum number of resident blocks per SM.
   [[nodiscard]] int get_max_blocks_per_sm() const { return m_prop.maxBlocksPerMultiProcessor; }
+#endif
 
   /// @return The maximum number of resident threads per SM.
   [[nodiscard]] int get_max_threads_per_sm() const { return m_prop.maxThreadsPerMultiProcessor; }
@@ -145,8 +164,13 @@ struct device_info
   /// @return The maximum number of threads per block.
   [[nodiscard]] int get_max_threads_per_block() const { return m_prop.maxThreadsPerBlock; }
 
+#if defined(__HIP_PLATFORM_AMD__)
+  /// @return The number of registers per CU.
+  [[nodiscard]] int get_registers_per_cu() const { return m_prop.regsPerBlock; } //see: https://github.com/ROCm-Developer-Tools/hipamd/blob/4209792929ddf54ba9530813b7879cfdee42df14/src/hip_device.cpp#LL295C35-L295C59 
+#else
   /// @return The number of registers per SM.
   [[nodiscard]] int get_registers_per_sm() const { return m_prop.regsPerMultiprocessor; }
+#endif
 
   /// @return The number of registers per block.
   [[nodiscard]] int get_registers_per_block() const { return m_prop.regsPerBlock; }
@@ -185,12 +209,19 @@ struct device_info
     return static_cast<std::size_t>(m_prop.l2CacheSize);
   }
 
+#if defined(__HIP_PLATFORM_AMD__)
+  [[nodiscard]] std::size_t get_shared_memory_per_cu() const
+  {
+    return m_prop.sharedMemPerBlock;
+  }
+#else
   /// @return The available amount of shared memory in bytes per SM.
   [[nodiscard]] std::size_t get_shared_memory_per_sm() const
   {
     /*Todo(HIP): m_prop.sharedMemPerMultiprocessor*/
     return m_prop.sharedMemPerBlock * 32;
   }
+#endif
 
   /// @return The available amount of shared memory in bytes per block.
   [[nodiscard]] std::size_t get_shared_memory_per_block() const { return m_prop.sharedMemPerBlock; }

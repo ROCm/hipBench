@@ -324,7 +324,45 @@ void json_printer::do_print_benchmark_results(const benchmark_vector &benches)
     }   // "version"
   }     // "meta"
 
-  add_devices_section(root);
+  {
+    auto &devices = root["devices"];
+    for (const auto &dev_info : nvbench::device_manager::get().get_devices())
+    {
+      auto &device                    = devices.emplace_back();
+      device["id"]                    = dev_info.get_id();
+      device["name"]                  = dev_info.get_name();
+      device["sm_version"]            = dev_info.get_sm_version();
+      device["ptx_version"]           = dev_info.get_ptx_version();
+      device["sm_default_clock_rate"] = dev_info.get_sm_default_clock_rate();
+      device["number_of_sms"]         = dev_info.get_number_of_sms();
+#if defined(__HIP_PLATFORM_AMD__)      
+      device["max_blocks_per_sm"]     = dev_info.get_max_blocks_per_cu();
+#else
+      device["max_blocks_per_sm"]     = dev_info.get_max_blocks_per_sm();
+#endif
+      device["max_threads_per_sm"]    = dev_info.get_max_threads_per_sm();
+      device["max_threads_per_block"] = dev_info.get_max_threads_per_block();
+#if defined(__HIP_PLATFORM_AMD__)      
+      device["registers_per_sm"]      = dev_info.get_registers_per_cu();
+#else
+      device["registers_per_sm"]      = dev_info.get_registers_per_sm();
+#endif
+      device["registers_per_block"]   = dev_info.get_registers_per_block();
+      device["global_memory_size"]    = dev_info.get_global_memory_size();
+      device["global_memory_bus_peak_clock_rate"] =
+        dev_info.get_global_memory_bus_peak_clock_rate();
+      device["global_memory_bus_width"]     = dev_info.get_global_memory_bus_width();
+      device["global_memory_bus_bandwidth"] = dev_info.get_global_memory_bus_bandwidth();
+      device["l2_cache_size"]               = dev_info.get_l2_cache_size();
+#if defined(__HIP_PLATFORM_AMD__)      
+      device["shared_memory_per_sm"]        = dev_info.get_shared_memory_per_cu();
+#else
+      device["shared_memory_per_sm"]        = dev_info.get_shared_memory_per_sm();
+#endif
+      device["shared_memory_per_block"]     = dev_info.get_shared_memory_per_block();
+      device["ecc_state"]                   = dev_info.get_ecc_state();
+    }
+  } // "devices"
 
   {
     auto &benchmarks = root["benchmarks"];

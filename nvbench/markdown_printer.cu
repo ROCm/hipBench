@@ -74,6 +74,15 @@ void markdown_printer::do_print_device_info()
     const auto [gmem_free, gmem_used] = device.get_global_memory_usage();
 
     fmt::format_to(std::back_inserter(buffer), "## [{}] `{}`\n", device.get_id(), device.get_name());
+#if defined(__HIP_PLATFORM_AMD__)    
+    fmt::format_to(std::back_inserter(buffer),
+                   "* CU Architecture: {}\n",
+                   device.get_cu_archname());
+    fmt::format_to(std::back_inserter(buffer), "* Number of CUs: {}\n", device.get_number_of_sms());
+    fmt::format_to(std::back_inserter(buffer),
+                   "* CU Max Clock Rate: {} MHz\n",
+                   device.get_cu_max_clock_rate() / 1000 / 1000);
+#else
     fmt::format_to(std::back_inserter(buffer),
                    "* SM Version: {} (PTX Version: {})\n",
                    device.get_sm_version(),
@@ -82,6 +91,7 @@ void markdown_printer::do_print_device_info()
     fmt::format_to(std::back_inserter(buffer),
                    "* SM Default Clock Rate: {} MHz\n",
                    device.get_sm_default_clock_rate() / 1000 / 1000);
+#endif
     fmt::format_to(std::back_inserter(buffer),
                    "* Global Memory: {} MiB Free / {} MiB Total\n",
                    gmem_free / 1024 / 1024,
@@ -91,6 +101,22 @@ void markdown_printer::do_print_device_info()
                    device.get_global_memory_bus_bandwidth() / 1000 / 1000 / 1000,
                    device.get_global_memory_bus_width(),
                    device.get_global_memory_bus_peak_clock_rate() / 1000 / 1000);
+#if defined(__HIP_PLATFORM_AMD__)    
+    fmt::format_to(std::back_inserter(buffer),
+                   "* Max Shared Memory: {} KiB/CU, {} KiB/Block\n",
+                   device.get_shared_memory_per_cu() / 1024,
+                   device.get_shared_memory_per_block() / 1024);
+    fmt::format_to(std::back_inserter(buffer), "* L2 Cache Size: {} KiB\n", device.get_l2_cache_size() / 1024);
+    fmt::format_to(std::back_inserter(buffer), "* Maximum Active Blocks: {}/CU\n", device.get_max_blocks_per_cu());
+    fmt::format_to(std::back_inserter(buffer),
+                   "* Maximum Active Threads: {}/CU, {}/Block\n",
+                   device.get_max_threads_per_sm(),
+                   device.get_max_threads_per_block());
+    fmt::format_to(std::back_inserter(buffer),
+                   "* Available Registers: {}/CU, {}/Block\n",
+                   device.get_registers_per_cu(),
+                   device.get_registers_per_block());
+#else
     fmt::format_to(std::back_inserter(buffer),
                    "* Max Shared Memory: {} KiB/SM, {} KiB/Block\n",
                    device.get_shared_memory_per_sm() / 1024,
@@ -105,6 +131,7 @@ void markdown_printer::do_print_device_info()
                    "* Available Registers: {}/SM, {}/Block\n",
                    device.get_registers_per_sm(),
                    device.get_registers_per_block());
+#endif
     fmt::format_to(std::back_inserter(buffer), "* ECC Enabled: {}\n", device.get_ecc_state() ? "Yes" : "No");
     fmt::format_to(std::back_inserter(buffer), "\n");
   }

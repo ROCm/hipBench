@@ -265,6 +265,10 @@ void state_generator::add_states_for_device(const std::optional<device_info> &de
       nvbench::named_values config = type_config;
       config.append(non_type_config);
 
+      // The constructor of state also invokes the default constructor of the stream.
+      // Set the correct device here to make sure that the stream is created on the 
+      // device where it will be used.
+      device->set_active();
       // Create benchmark:
       m_states.push_back(nvbench::state{m_benchmark, std::move(config), device, type_config_index});
     }

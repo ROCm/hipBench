@@ -54,7 +54,7 @@
     const cudaError_t nvbench_cuda_call_error = call;                                              \
     if (nvbench_cuda_call_error != cudaSuccess)                                                    \
     {                                                                                              \
-      cudaGetLastError();                                                                          \
+      (void)cudaGetLastError();                                                                          \
       nvbench::cuda_call::throw_error(__FILE__, __LINE__, #call, nvbench_cuda_call_error);         \
     }                                                                                              \
   } while (false)
