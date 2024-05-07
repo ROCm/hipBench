@@ -1,3 +1,17 @@
+# =============================================================================
+# Copyright (c) 2021, NVIDIA CORPORATION.
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+# in compliance with the License. You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software distributed under the License
+# is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+# or implied. See the License for the specific language governing permissions and limitations under
+# the License.
+# =============================================================================
+
 # MIT License
 #
 # Modifications Copyright (C) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
@@ -20,28 +34,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-# Called before project(...)
-macro(nvbench_load_rapids_cmake)
-  if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/NVBENCH_RAPIDS.cmake")
-    file(DOWNLOAD
-      https://raw.githubusercontent.com/rapidsai/rapids-cmake/branch-23.12/RAPIDS.cmake
-      "${CMAKE_CURRENT_BINARY_DIR}/NVBENCH_RAPIDS.cmake"
-    )
-  endif()
-  include("${CMAKE_CURRENT_BINARY_DIR}/NVBENCH_RAPIDS.cmake")
+# Use CPM to find or clone libhipcxx
+function(find_and_configure_libhipcxx)
+  include(${rapids-cmake-dir}/cpm/libhipcxx.cmake)
 
-  include(rapids-cmake)
-  include(rapids-cpm)
-  include(rapids-cuda)
-  include(rapids-export)
-  include(rapids-find)
+  rapids_cpm_libhipcxx(
+    BUILD_EXPORT_SET nvbench-targets
+    INSTALL_EXPORT_SET nvbench-targets
+  )
 
-  rapids_cuda_init_architectures(NVBench)
-endmacro()
+endfunction()
 
-# Called after project(...)
-macro(nvbench_init_rapids_cmake)
-  rapids_cmake_build_type(Release)
-  rapids_cmake_write_version_file("${NVBench_BINARY_DIR}/nvbench/detail/version.cuh")
-  rapids_cpm_init()
-endmacro()
+find_and_configure_libhipcxx()
