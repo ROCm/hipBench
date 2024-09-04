@@ -19,7 +19,7 @@
 macro(nvbench_load_rapids_cmake)
   if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/NVBENCH_RAPIDS.cmake")
     file(DOWNLOAD
-    https://$ENV{GITHUB_USER}:$ENV{GITHUB_PASS}@raw.githubusercontent.com/AMD-AI/rapids-cmake/main/RAPIDS.cmake
+      https://raw.githubusercontent.com/ROCm/rapids-cmake/branch-24.06/RAPIDS.cmake
       "${CMAKE_CURRENT_BINARY_DIR}/NVBENCH_RAPIDS.cmake"
     )
   endif()
