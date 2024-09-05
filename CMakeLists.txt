@@ -57,6 +57,12 @@ include(cmake/NVBenchInstallRules.cmake)
 include(cmake/NVBenchUtilities.cmake)
 include(cmake/NVBenchLibhipcxx.cmake)
 
+# synchronize HIP and CUDA architectures
+if (DEFINED CMAKE_HIP_ARCHITECTURES AND NOT CMAKE_CUDA_ARCHITECTURES)
+  set(CMAKE_CUDA_ARCHITECTURES ${CMAKE_HIP_ARCHITECTURES})
+elseif (DEFINED CMAKE_CUDA_ARCHITECTURES AND NOT CMAKE_HIP_ARCHITECTURES)
+  set(CMAKE_HIP_ARCHITECTURES ${CMAKE_CUDA_ARCHITECTURES})
+endif()
 message(STATUS "NVBench CUDA architectures: ${CMAKE_CUDA_ARCHITECTURES}")
 
 add_subdirectory(nvbench)
