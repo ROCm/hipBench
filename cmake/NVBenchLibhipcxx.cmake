@@ -31,15 +31,13 @@
 
 # Use CPM to find or clone libhipcxx
 function(find_and_configure_libhipcxx)
-    include(${rapids-cmake-dir}/cpm/libhipcxx.cmake)
+  include(${rapids-cmake-dir}/cpm/libhipcxx.cmake)
 
-    set(exports BUILD_EXPORT_SET nvbench-exports)
-    if(INSTALL_nvbench)
-      list(APPEND exports INSTALL_EXPORT_SET nvbench-exports)
-    endif()
+  rapids_cpm_libhipcxx(
+    BUILD_EXPORT_SET nvbench-targets
+    INSTALL_EXPORT_SET nvbench-targets
+  )
 
-    rapids_cpm_libhipcxx(${exports})
-    set(LIBHIPCXX_INCLUDE_DIR "${libhipcxx_SOURCE_DIR}/include" PARENT_SCOPE)
 endfunction()
 
 find_and_configure_libhipcxx()
