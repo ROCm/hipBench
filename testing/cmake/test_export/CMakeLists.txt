@@ -36,6 +36,8 @@ add_test(NAME nvbench_ctl COMMAND "$<TARGET_FILE:nvbench::ctl>")
 # Setup LD_LIBRARY_PATH for testing
 if (UNIX)
   set(ctl_lib_path "")
+  #: TODO(HIP/AMD): replace by ROCm analogue
+  #: set(cupti_lib_path "")
 
   # Need to find installed libnvbench.so for installed nvbench-ctl.
   # Not needed for build_tree test because of RUNPATH.
@@ -58,5 +60,20 @@ if (UNIX)
     )
     cmake_path(GET ctl_lib_path PARENT_PATH ctl_lib_path)
   endif()
+
+  #: TODO(HIP/AMD): replace by ROCm analogue
+  #: # Need to add the CUPTI path to LD_LIBRARY_PATH to make sure CUPTI libraries
+  #: # are found at runtime:
+  #: if (TARGET nvbench::cupti)
+  #:   get_property(cupti_lib_path TARGET nvbench::cupti PROPERTY IMPORTED_LOCATION)
+  #:   cmake_path(GET cupti_lib_path PARENT_PATH cupti_lib_path)
+  #: endif()
+
+  #: set_property(TEST test_bench PROPERTY
+  #:   ENVIRONMENT "LD_LIBRARY_PATH=${cupti_lib_path}"
+  #: )
+  set_property(TEST nvbench_ctl PROPERTY
+    ENVIRONMENT "LD_LIBRARY_PATH=${ctl_lib_path}:${cupti_lib_path}"
+  )
 
 endif()
