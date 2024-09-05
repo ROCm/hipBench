@@ -17,12 +17,34 @@
 
 # Called before project(...)
 macro(nvbench_load_rapids_cmake)
-  if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/NVBENCH_RAPIDS.cmake")
-    file(DOWNLOAD
-    https://$ENV{GITHUB_USER}:$ENV{GITHUB_PASS}@raw.githubusercontent.com/AMD-AI/rapids-cmake/main/RAPIDS.cmake
-      "${CMAKE_CURRENT_BINARY_DIR}/NVBENCH_RAPIDS.cmake"
+  if(NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/NVBENCH_RAPIDS.cmake)
+    if(DEFINED ENV{RAPIDS_CMAKE_SCRIPT_BRANCH})
+      set(RAPIDS_CMAKE_SCRIPT_BRANCH "$ENV{RAPIDS_CMAKE_SCRIPT_BRANCH}")
+    else()
+      set(RAPIDS_CMAKE_SCRIPT_BRANCH branch-24.06)
+    endif()
+
+    set(URL "https://raw.githubusercontent.com/ROCm/rapids-cmake/${RAPIDS_CMAKE_SCRIPT_BRANCH}/RAPIDS.cmake")
+    file(DOWNLOAD ${URL}
+      ${CMAKE_CURRENT_BINARY_DIR}/NVBENCH_RAPIDS.cmake
+      STATUS DOWNLOAD_STATUS
     )
+    list(GET DOWNLOAD_STATUS 0 STATUS_CODE)
+    list(GET DOWNLOAD_STATUS 1 ERROR_MESSAGE)
+
+    if(${STATUS_CODE} EQUAL 0)
+      message(STATUS "Downloaded 'NVBENCH_RAPIDS.cmake' successfully!")
+    else()
+      file(REMOVE ${CMAKE_CURRENT_BINARY_DIR}/NVBENCH_RAPIDS.cmake)
+      # for debuging: message(FATAL_ERROR "Failed to download 'NVBENCH_RAPIDS.cmake'. URL: ${URL}, Reason: ${ERROR_MESSAGE}")
+      message(FATAL_ERROR "Failed to download 'NVBENCH_RAPIDS.cmake'. Reason: ${ERROR_MESSAGE}")
+    endif()
   endif()
+
+  if(DEFINED ENV{RAPIDS_CMAKE_BRANCH})
+    set(rapids-cmake-branch $ENV{RAPIDS_CMAKE_BRANCH})
+  endif()
+
   include("${CMAKE_CURRENT_BINARY_DIR}/NVBENCH_RAPIDS.cmake")
 
   include(rapids-cmake)
