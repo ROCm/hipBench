@@ -133,11 +133,9 @@ Examples are built by default into `build/bin` and are prefixed with `nvbench.ex
 
 # Log
 
-```
 Run:  [1/1] throughput_bench [Device=0]
 Pass: Cold: 0.153360ms GPU, 0.161058ms CPU, 0.50s total GPU, 0.64s total wall, 3264x 
 Pass: Batch: 0.146135ms GPU, 0.50s total GPU, 0.50s total wall, 3422x
-```
 
 # Benchmark Results
 
