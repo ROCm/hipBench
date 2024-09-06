@@ -169,6 +169,7 @@ Contributions are welcome!
 
 To build `nvbench` tests:
 ```
+export CMAKE_PREFIX_PATH=/opt/rocm/lib/cmake
 mkdir -p build
 cd build
 cmake -DNVBench_ENABLE_TESTING=ON .. && make
@@ -182,7 +183,7 @@ make test
 ```
 or
 ```
-ctest
+CMAKE_PREFIX_PATH=/opt/rocm/lib/cmake ctest .
 ```
 # License
 
