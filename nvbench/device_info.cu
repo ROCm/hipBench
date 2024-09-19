@@ -45,7 +45,7 @@
 #include <nvbench/detail/device_scope.cuh>
 #include <nvbench/internal/nvml.cuh>
 
-#include <cuda_runtime_api.h>
+#include <nvbench/cuda_runtime_api.h>
 
 #define UNUSED(x) (void)(x)
 
@@ -67,10 +67,11 @@ device_info::device_info(int id)
     , m_nvml_device(nullptr)
 {
   NVBENCH_CUDA_CALL(cudaGetDeviceProperties(&m_prop, m_id));
+#ifdef NVBENCH_HAS_NVML // TODO(HIP): Replace with ROCm analogue
   // NVML's lifetime should extend for the entirety of the process, so store in a
   // global.
   [[maybe_unused]] static auto nvml_lifetime = nvbench::nvml::NVMLLifetimeManager();
-
+#endif // NVBENCH_HAS_NVML
 #ifdef NVBENCH_HAS_NVML
   // Retrieve the current device's pci_id as a null-terminated string.
   // Docs say 13 chars should always be sufficient.

@@ -33,6 +33,10 @@ message(STATUS "NVBench_DIR=${NVBench_DIR}")
 find_package(NVBench REQUIRED)
 
 add_executable(test_bench test_bench.cu)
+
+set_source_files_properties(test_bench.cu
+	                PROPERTIES LANGUAGE HIP)
+
 target_link_libraries(test_bench PRIVATE nvbench::main)
 enable_testing()
 add_test(NAME test_bench COMMAND "$<TARGET_FILE:test_bench>" --timeout 1)

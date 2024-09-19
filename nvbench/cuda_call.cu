@@ -87,8 +87,6 @@ void throw_error(const std::string &filename,
                                        string,
                                        command));
 }
-#else
-void throw_error(const std::string &, std::size_t, const std::string &, CUresult) {}
 #endif
 
 void exit_error(const std::string &filename,

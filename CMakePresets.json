@@ -14,12 +14,12 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_CUDA_ARCHITECTURES": "all-major",
-        "NVBench_ENABLE_CUPTI": true,
+        "NVBench_ENABLE_CUPTI": false,
         "NVBench_ENABLE_DEVICE_TESTING": false,
         "NVBench_ENABLE_EXAMPLES": true,
         "NVBench_ENABLE_HEADER_TESTING": true,
         "NVBench_ENABLE_INSTALL_RULES": true,
-        "NVBench_ENABLE_NVML": true,
+        "NVBench_ENABLE_NVML": false,
         "NVBench_ENABLE_TESTING": true,
         "NVBench_ENABLE_WERROR": true
       }

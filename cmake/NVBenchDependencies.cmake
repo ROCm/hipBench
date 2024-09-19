@@ -50,9 +50,9 @@ rapids_cpm_find(nlohmann_json 3.11.3
   CPM_ARGS
     URL https://github.com/nlohmann/json/releases/download/v3.11.3/include.zip
     URL_HASH SHA256=a22461d13119ac5c78f205d3df1db13403e58ce1bb1794edc9313677313f4a9d
-  PATCH_COMMAND
+    PATCH_COMMAND
     ${CMAKE_COMMAND}
-      -D "CUDA_VERSION=${CMAKE_CUDA_COMPILER_VERSION}"
+      -D "CUDA_VERSION=${CMAKE_HIP_COMPILER_VERSION}"
       -D "CXX_VERSION=${CMAKE_CXX_COMPILER_VERSION}"
       -D "CXX_ID=${CMAKE_CXX_COMPILER_ID}"
       -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/patches/json_unordered_map_ice.cmake"
@@ -72,13 +72,14 @@ endif()
 
 ################################################################################
 # CUDAToolkit
-rapids_find_package(CUDAToolkit REQUIRED
+rapids_find_package(HIP REQUIRED
   BUILD_EXPORT_SET nvbench-targets
   INSTALL_EXPORT_SET nvbench-targets
 )
 
 # Append CTK targets to this as we add optional deps (NMVL, CUPTI, ...)
 set(ctk_libraries hip::host)
+
 ################################################################################
 # CUDAToolkit -> NVML
 if (NVBench_ENABLE_NVML)
@@ -92,3 +93,9 @@ if (NVBench_ENABLE_CUPTI)
   include("${CMAKE_CURRENT_LIST_DIR}/NVBenchCUPTI.cmake")
   list(APPEND ctk_libraries CUDA::cuda_driver nvbench::cupti)
 endif()
+
+################################################################################
+# Libhipcxx
+include("${CMAKE_CURRENT_LIST_DIR}/NVBenchLibhipcxx.cmake")
+list(APPEND ctk_libraries libhipcxx::libhipcxx hip::host)
+################################################################################

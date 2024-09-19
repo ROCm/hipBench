@@ -47,7 +47,7 @@
 
 #include <cuda/std/chrono>
 
-#include <cuda_runtime.h>
+#include <nvbench/cuda_runtime_api.h>
 
 #include <cstdio>
 #include <cstdlib>
@@ -124,10 +124,10 @@ namespace nvbench
 blocking_kernel::blocking_kernel()
 {
   NVBENCH_CUDA_CALL(cudaHostRegister(&m_host_flag, sizeof(m_host_flag), cudaHostRegisterMapped));
-  NVBENCH_CUDA_CALL(cudaHostGetDevicePointer(&m_device_flag, &m_host_flag, 0));
+  NVBENCH_CUDA_CALL(cudaHostGetDevicePointer((void **)&m_device_flag, &m_host_flag, 0));
   NVBENCH_CUDA_CALL(
     cudaHostRegister(&m_host_timeout_flag, sizeof(m_host_timeout_flag), cudaHostRegisterMapped));
-  NVBENCH_CUDA_CALL(cudaHostGetDevicePointer(&m_device_timeout_flag, &m_host_timeout_flag, 0));
+  NVBENCH_CUDA_CALL(cudaHostGetDevicePointer((void **)&m_device_timeout_flag, &m_host_timeout_flag, 0));
 }
 
 blocking_kernel::~blocking_kernel()

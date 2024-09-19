@@ -43,7 +43,7 @@
 
 #include <nvbench/cuda_call.cuh>
 
-#include <cuda_runtime_api.h>
+#include <nvbench/cuda_runtime_api.h>
 
 #include <memory>
 

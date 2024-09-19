@@ -41,8 +41,8 @@
 
 #pragma once
 
-#include <cuda.h>
-#include <cuda_runtime_api.h>
+#include <nvbench/cuda_runtime.h>
+#include <nvbench/cuda_runtime_api.h>
 
 #include <string>
 

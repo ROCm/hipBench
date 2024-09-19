@@ -53,7 +53,7 @@
 #include <nvbench/detail/l2flush.cuh>
 #include <nvbench/detail/statistics.cuh>
 
-#include <cuda_runtime.h>
+#include <nvbench/cuda_runtime.h>
 
 #include <utility>
 #include <vector>

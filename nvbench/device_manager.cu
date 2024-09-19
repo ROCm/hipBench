@@ -41,7 +41,7 @@
 
 #include <nvbench/device_manager.cuh>
 
-#include <cuda_runtime_api.h>
+#include <nvbench/cuda_runtime_api.h>
 
 #include <nvbench/cuda_call.cuh>
 #include <nvbench/detail/device_scope.cuh>

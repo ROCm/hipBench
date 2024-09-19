@@ -45,6 +45,12 @@
 #  define cudaStreamPerThread hipStreamPerThread
 #endif
 
+#ifdef __HIP_PLATFORM_AMD__  
+  constexpr bool HIP_PLATFORM_AMD = true;
+#else
+  constexpr bool HIP_PLATFORM_AMD = false;
+#endif
+
 // Simple hipification mappings
 #ifndef cudaArray_const_t
 #  define cudaArray_const_t hipArray_const_t

@@ -45,7 +45,7 @@
 
 #include <nvbench/types.cuh>
 
-#include <cuda_runtime_api.h>
+#include <nvbench/cuda_runtime_api.h>
 
 namespace nvbench
 {

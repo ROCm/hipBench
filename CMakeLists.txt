@@ -49,18 +49,18 @@ nvbench_init_rapids_cmake()
 # Define NVBench_DETECTED_${LANG}_STANDARDS
 include(cmake/DetectSupportedStandards.cmake)
 detect_supported_standards(NVBench CXX 17 20)
-detect_supported_standards(NVBench CUDA 17 20)
+detect_supported_standards(NVBench HIP 17 20)
 
 # See NVIDIA/NVBench#52
-find_package(CUDAToolkit REQUIRED)
-set(cupti_default ON)
-if (${CUDAToolkit_VERSION} VERSION_LESS 11.3)
-  set(cupti_default OFF)
-endif()
+find_package(HIP REQUIRED)
+set(cupti_default OFF) # TODO(HIP): Replace with ROCm analogue
+#if (${CUDAToolkit_VERSION} VERSION_LESS 11.3)
+#  set(cupti_default OFF)
+#endif()
 
 option(BUILD_SHARED_LIBS "Build NVBench as a shared library" ON)
 
-option(NVBench_ENABLE_NVML "Build with NVML support from the Cuda Toolkit." ON)
+option(NVBench_ENABLE_NVML "Build with NVML support from the Cuda Toolkit." OFF)
 option(NVBench_ENABLE_CUPTI "Build NVBench with CUPTI." ${cupti_default})
 
 option(NVBench_ENABLE_TESTING "Build NVBench testing suite." OFF)
@@ -81,7 +81,14 @@ include(cmake/NVBenchExports.cmake)
 include(cmake/NVBenchWriteConfigHeader.cmake)
 include(cmake/NVBenchDependencies.cmake)
 include(cmake/NVBenchInstallRules.cmake)
+include(cmake/NVBenchLibhipcxx.cmake)
 
+# synchronize HIP and CUDA architectures
+if (DEFINED CMAKE_HIP_ARCHITECTURES AND NOT CMAKE_CUDA_ARCHITECTURES)
+  set(CMAKE_CUDA_ARCHITECTURES ${CMAKE_HIP_ARCHITECTURES})
+elseif (DEFINED CMAKE_CUDA_ARCHITECTURES AND NOT CMAKE_HIP_ARCHITECTURES)
+  set(CMAKE_HIP_ARCHITECTURES ${CMAKE_CUDA_ARCHITECTURES})
+endif()
 message(STATUS "NVBench CUDA architectures: ${CMAKE_CUDA_ARCHITECTURES}")
 
 add_subdirectory(nvbench)

@@ -74,7 +74,7 @@ void copy_sweep_grid_shape(nvbench::state &state)
   state.exec(
     [block_size,
      num_blocks,
-     /*Todo(HIP): num_values,*/
+     num_values,
      in_ptr  = thrust::raw_pointer_cast(in.data()),
      out_ptr = thrust::raw_pointer_cast(out.data())](nvbench::launch &launch) {
       (void) num_values; // clang thinks this is unused...
@@ -108,7 +108,7 @@ void copy_type_sweep(nvbench::state &state, nvbench::type_list<ValueType>)
   thrust::device_vector<ValueType> out(num_values, 0);
 
   state.exec(
-    [/*Todo(HIP): num_values,*/
+    [num_values,
      in_ptr  = thrust::raw_pointer_cast(in.data()),
      out_ptr = thrust::raw_pointer_cast(out.data())](nvbench::launch &launch) {
       (void) num_values; // clang thinks this is unused...
@@ -155,7 +155,7 @@ void copy_type_conversion_sweep(nvbench::state &state,
   thrust::device_vector<OutputType> out(num_values, 0);
 
   state.exec(
-    [/*Todo(HIP): num_values,*/
+    [num_values,
      in_ptr  = thrust::raw_pointer_cast(in.data()),
      out_ptr = thrust::raw_pointer_cast(out.data())](nvbench::launch &launch) {
       (void) num_values; // clang thinks this is unused...

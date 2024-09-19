@@ -47,7 +47,7 @@
 #include <nvbench/exec_tag.cuh>
 #include <nvbench/launch.cuh>
 
-#include <cuda_runtime.h>
+#include <nvbench/cuda_runtime.h>
 
 #include <algorithm>
 

@@ -51,7 +51,7 @@ set(srcs
   detail/state_generator.cxx
   detail/stdrel_criterion.cxx
 
-  internal/nvml.cxx
+  # internal/nvml.cxx # NOTE(HIP): We do not support NVML
 )
 
 if (NVBench_ENABLE_CUPTI)

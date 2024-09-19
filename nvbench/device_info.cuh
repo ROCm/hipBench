@@ -44,7 +44,7 @@
 #include <nvbench/cuda_call.cuh>
 #include <nvbench/detail/device_scope.cuh>
 
-#include <cuda_runtime_api.h>
+#include <nvbench/cuda_runtime_api.h>
 
 #include <cstdint> // CHAR_BIT
 #include <stdexcept>
@@ -218,8 +218,7 @@ struct device_info
   /// @return The available amount of shared memory in bytes per SM.
   [[nodiscard]] std::size_t get_shared_memory_per_sm() const
   {
-    /*Todo(HIP): m_prop.sharedMemPerMultiprocessor*/
-    return m_prop.sharedMemPerBlock * 32;
+    return m_prop.sharedMemPerMultiprocessor;
   }
 #endif
 

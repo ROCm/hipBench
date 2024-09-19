@@ -82,6 +82,11 @@ else()
 
   if (NVBench_ENABLE_WERROR)
     nvbench_add_cxx_flag(nvbench.build_interface INTERFACE "-Werror")
+    nvbench_add_cxx_flag(nvbench.build_interface INTERFACE "-Wno-unused-private-field")
+    nvbench_add_cxx_flag(nvbench.build_interface INTERFACE "-Wno-conversion")
+    nvbench_add_cxx_flag(nvbench.build_interface INTERFACE "-Wno-bitwise-instead-of-logical")
+    nvbench_add_cxx_flag(nvbench.build_interface INTERFACE "-Wno-unused-variable")
+    nvbench_add_cxx_flag(nvbench.build_interface INTERFACE "-Wno-defaulted-function-deleted")
   endif()
 endif()
 

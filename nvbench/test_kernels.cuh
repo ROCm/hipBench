@@ -45,7 +45,7 @@
 
 #include <cuda/std/chrono>
 
-#include <cuda_runtime.h>
+#include <nvbench/cuda_runtime.h>
 
 /*!
  * @file test_kernels.cuh

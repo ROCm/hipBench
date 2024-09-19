@@ -59,30 +59,15 @@ macro(nvbench_generate_exports)
       EXPORT_SET nvbench-targets
       NAMESPACE "nvbench::"
       GLOBAL_TARGETS nvbench main ctl internal_build_interface
-      LANGUAGES CUDA CXX
+      LANGUAGES HIP CXX
       FINAL_CODE_BLOCK nvbench_build_export_code_block
     )
     rapids_export(INSTALL NVBench
       EXPORT_SET nvbench-targets
       NAMESPACE "nvbench::"
       GLOBAL_TARGETS nvbench main ctl internal_build_interface
-      LANGUAGES CUDA CXX
+      LANGUAGES HIP CXX
       FINAL_CODE_BLOCK nvbench_install_export_code_block
     )
   endif()
-
-  rapids_export(BUILD NVBench
-    EXPORT_SET nvbench-targets
-    NAMESPACE "nvbench::"
-    GLOBAL_TARGETS nvbench main ctl internal_build_interface
-    LANGUAGES HIP CXX
-    FINAL_CODE_BLOCK nvbench_build_export_code_block
-  )
-  rapids_export(INSTALL NVBench
-    EXPORT_SET nvbench-targets
-    NAMESPACE "nvbench::"
-    GLOBAL_TARGETS nvbench main ctl internal_build_interface
-    LANGUAGES HIP CXX
-    FINAL_CODE_BLOCK nvbench_install_export_code_block
-  )
 endmacro()
