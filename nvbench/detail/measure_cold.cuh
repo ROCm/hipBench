@@ -1,5 +1,5 @@
 /*
- *  Copyright 2021 NVIDIA Corporation
+ *  Copyright 2021 NVIDIA Corporation 
  *
  *  Licensed under the Apache License, Version 2.0 with the LLVM exception
  *  (the "License"); you may not use this file except in compliance with
@@ -16,6 +16,24 @@
  *  limitations under the License.
  */
 
+// MIT License
+// Modifications Copyright (c) 2024 Advanced Micro Devices, Inc.
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+
 #pragma once
 
 #include <nvbench/blocking_kernel.cuh>
@@ -25,14 +43,15 @@
 #include <nvbench/device_info.cuh>
 #include <nvbench/exec_tag.cuh>
 #include <nvbench/launch.cuh>
-#include <nvbench/stopping_criterion.cuh>
 
 #include <nvbench/detail/kernel_launcher_timer_wrapper.cuh>
 #include <nvbench/detail/l2flush.cuh>
+#include <nvbench/detail/ring_buffer.cuh>
 #include <nvbench/detail/statistics.cuh>
 
-#include <cuda_runtime.h>
+#include <hip/hip_runtime.h>
 
+#include <algorithm>
 #include <utility>
 #include <vector>
 
@@ -71,7 +90,7 @@ protected:
 
   __forceinline__ void sync_stream() const
   {
-    NVBENCH_CUDA_CALL(cudaStreamSynchronize(m_launch.get_stream()));
+    NVBENCH_CUDA_CALL(hipStreamSynchronize(m_launch.get_stream()));
   }
 
   void block_stream();
@@ -86,13 +105,12 @@ protected:
   nvbench::detail::l2flush m_l2flush;
   nvbench::blocking_kernel m_blocker;
 
-  nvbench::criterion_params m_criterion_params;
-  nvbench::stopping_criterion* m_stopping_criterion{};
-
   bool m_run_once{false};
   bool m_no_block{false};
 
   nvbench::int64_t m_min_samples{};
+  nvbench::float64_t m_max_noise{}; // rel stdev
+  nvbench::float64_t m_min_time{};
 
   nvbench::float64_t m_skip_time{};
   nvbench::float64_t m_timeout{};
@@ -101,6 +119,9 @@ protected:
   nvbench::float64_t m_total_cuda_time{};
   nvbench::float64_t m_total_cpu_time{};
   nvbench::float64_t m_cpu_noise{}; // rel stdev
+
+  // Trailing history of noise measurements for convergence tests
+  nvbench::detail::ring_buffer<nvbench::float64_t> m_noise_tracker{512};
 
   std::vector<nvbench::float64_t> m_cuda_times;
   std::vector<nvbench::float64_t> m_cpu_times;

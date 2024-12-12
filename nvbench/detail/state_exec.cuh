@@ -1,5 +1,5 @@
 /*
- *  Copyright 2021 NVIDIA Corporation
+ *  Copyright 2021 NVIDIA Corporation 
  *
  *  Licensed under the Apache License, Version 2.0 with the LLVM exception
  *  (the "License"); you may not use this file except in compliance with
@@ -16,6 +16,25 @@
  *  limitations under the License.
  */
 
+
+// MIT License
+// Modifications Copyright (c) 2024 Advanced Micro Devices, Inc.
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+
 #pragma once
 
 #ifndef NVBENCH_STATE_EXEC_GUARD
@@ -28,9 +47,6 @@
 #include <nvbench/state.cuh>
 
 #include <nvbench/detail/kernel_launcher_timer_wrapper.cuh>
-#ifdef NVBENCH_HAS_CUPTI
-#include <nvbench/detail/measure_cupti.cuh>
-#endif // NVBENCH_HAS_CUPTI
 #include <nvbench/detail/measure_cold.cuh>
 #include <nvbench/detail/measure_hot.cuh>
 
@@ -38,11 +54,6 @@
 
 namespace nvbench
 {
-
-// warning C4702: unreachable code
-// Several spurious instances in this function. MSVC 2019 seems to forget that
-// sometimes the constexpr branch /isn't/ taken.
-NVBENCH_MSVC_PUSH_DISABLE_WARNING(4702)
 
 template <typename ExecTags, typename KernelLauncher>
 void state::exec(ExecTags tags, KernelLauncher &&kernel_launcher)
@@ -98,19 +109,6 @@ void state::exec(ExecTags tags, KernelLauncher &&kernel_launcher)
     constexpr bool use_blocking_kernel = !(tags & no_block);
     if constexpr (tags & timer)
     {
-// Estimate bandwidth here
-#ifdef NVBENCH_HAS_CUPTI
-      if constexpr (!(modifier_tags & run_once))
-      {
-        if (this->is_cupti_required())
-        {
-          using measure_t = nvbench::detail::measure_cupti<KL>;
-          measure_t measure{*this, kernel_launcher};
-          measure();
-        }
-      }
-#endif
-
       using measure_t = nvbench::detail::measure_cold<KL, use_blocking_kernel>;
       measure_t measure{*this, kernel_launcher};
       measure();
@@ -119,20 +117,6 @@ void state::exec(ExecTags tags, KernelLauncher &&kernel_launcher)
     { // Need to wrap the kernel launcher with a timer wrapper:
       using wrapper_t = nvbench::detail::kernel_launch_timer_wrapper<KL>;
       wrapper_t wrapper{kernel_launcher};
-
-// Estimate bandwidth here
-#ifdef NVBENCH_HAS_CUPTI
-      if constexpr (!(modifier_tags & run_once))
-      {
-        if (this->is_cupti_required())
-        {
-          using measure_t = nvbench::detail::measure_cupti<wrapper_t>;
-          measure_t measure{*this, wrapper};
-          measure();
-        }
-      }
-#endif
-
       using measure_t = nvbench::detail::measure_cold<wrapper_t, use_blocking_kernel>;
       measure_t measure(*this, wrapper);
       measure();
@@ -149,7 +133,4 @@ void state::exec(ExecTags tags, KernelLauncher &&kernel_launcher)
     measure();
   }
 }
-
-NVBENCH_MSVC_POP_WARNING()
-
 } // namespace nvbench

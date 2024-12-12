@@ -1,30 +1,28 @@
-# By default, add dependent DLLs to the build dir on MSVC. This avoids
-# a variety of runtime issues when using NVML, etc.
-# This behavior can be disabled using the following options:
-if (WIN32)
-  option(NVBench_ADD_DEPENDENT_DLLS_TO_BUILD
-    "Copy dependent dlls to NVBench library build location (MSVC only)."
-    ON
-  )
-else()
-  # These are forced off for non-MSVC builds, as $<TARGET_RUNTIME_DLLS:...>
-  # will always be empty on non-dll platforms.
-  set(NVBench_ADD_DEPENDENT_DLLS_TO_BUILD OFF)
-endif()
+# Modifications Copyright (c) 2024 Advanced Micro Devices, Inc.
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
 
-function(nvbench_setup_dep_dlls target_name)
-  # The custom command below fails when there aren't any runtime DLLs to copy,
-  # so only enable it when a relevant dependency is enabled:
-  if (NVBench_ADD_DEPENDENT_DLLS_TO_BUILD AND
-      (NVBench_ENABLE_NVML OR
-       NVBench_ENABLE_CUPTI))
-    add_custom_command(TARGET ${target_name}
-      POST_BUILD
-      COMMAND
-        "${CMAKE_COMMAND}" -E copy
-          "$<TARGET_RUNTIME_DLLS:${target_name}>"
-          "$<TARGET_FILE_DIR:${target_name}>"
-      COMMAND_EXPAND_LISTS
-    )
-  endif()
-endfunction()
+# These are forced off for non-MSVC builds, as $<TARGET_RUNTIME_DLLS:...>
+# will always be empty on non-dll platforms.
+set(NVBench_ADD_DEPENDENT_DLLS_TO_BUILD OFF)
+
+if (NVBench_ADD_DEPENDENT_DLLS_TO_BUILD)
+  message(STATUS
+    "CMake 3.21.0 is required when NVBench_ADD_DEPENDENT_DLLS_TO_BUILD "
+    "is enabled."
+  )
+  cmake_minimum_required(VERSION 3.21.0)
+endif()

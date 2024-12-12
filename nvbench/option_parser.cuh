@@ -1,5 +1,5 @@
 /*
- *  Copyright 2021 NVIDIA Corporation
+ *  Copyright 2021 NVIDIA Corporation 
  *
  *  Licensed under the Apache License, Version 2.0 with the LLVM exception
  *  (the "License"); you may not use this file except in compliance with
@@ -16,11 +16,29 @@
  *  limitations under the License.
  */
 
+
+// MIT License
+// Modifications Copyright (c) 2024 Advanced Micro Devices, Inc.
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+
 #pragma once
 
 #include <nvbench/device_info.cuh>
 #include <nvbench/printer_multiplex.cuh>
-#include <nvbench/stopping_criterion.cuh>
 
 #include <iosfwd>
 #include <memory>
@@ -80,14 +98,13 @@ private:
   std::ostream &printer_spec_to_ostream(const std::string &spec);
 
   void print_version() const;
-  void print_list(printer_base& printer) const;
+  void print_list() const;
   void print_help() const;
   void print_help_axis() const;
 
   void set_persistence_mode(const std::string &state);
   void lock_gpu_clocks(const std::string &rate);
 
-  void set_stopping_criterion(const std::string &criterion);
   void enable_run_once();
   void disable_blocking_kernel();
 
@@ -112,10 +129,6 @@ private:
 
   void update_int64_prop(const std::string &prop_arg, const std::string &prop_val);
   void update_float64_prop(const std::string &prop_arg, const std::string &prop_val);
-
-  void update_criterion_prop(const std::string &prop_arg,
-                             const std::string &prop_val,
-                             const nvbench::named_values::type type);
 
   void update_used_device_state() const;
 

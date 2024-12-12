@@ -1,21 +1,35 @@
+# Modifications Copyright (c) 2024 Advanced Micro Devices, Inc.
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+
 ################################################################################
 # fmtlib/fmt
-include("${rapids-cmake-dir}/cpm/fmt.cmake")
-
-if(NOT BUILD_SHARED_LIBS AND NVBench_ENABLE_INSTALL_RULES)
-set(export_set_details BUILD_EXPORT_SET nvbench-targets
-                       INSTALL_EXPORT_SET nvbench-targets)
-endif()
-
-rapids_cpm_fmt(${export_set_details}
+rapids_cpm_find(fmt 9.1.0
   CPM_ARGS
+    GITHUB_REPOSITORY fmtlib/fmt
+    GIT_TAG 9.1.0
+    GIT_SHALLOW TRUE
     OPTIONS
       # Force static to keep fmt internal.
       "BUILD_SHARED_LIBS OFF"
+      "CMAKE_POSITION_INDEPENDENT_CODE ON"
 )
 
-if(NOT fmt_ADDED)
-  set(fmt_is_external TRUE)
+if(TARGET fmt::fmt AND NOT TARGET fmt)
+  add_library(fmt ALIAS fmt::fmt)
 endif()
 
 ################################################################################
@@ -58,24 +72,15 @@ endif()
 
 ################################################################################
 # CUDAToolkit
-rapids_find_package(CUDAToolkit REQUIRED
+rapids_find_package(HIP REQUIRED
   BUILD_EXPORT_SET nvbench-targets
   INSTALL_EXPORT_SET nvbench-targets
 )
 
-# Append CTK targets to this as we add optional deps (NMVL, CUPTI, ...)
-set(ctk_libraries CUDA::toolkit)
-
+# Append CTK targets to this as we add optional deps
+set(ctk_libraries hip::host)
 ################################################################################
-# CUDAToolkit -> NVML
-if (NVBench_ENABLE_NVML)
-  include("${CMAKE_CURRENT_LIST_DIR}/NVBenchNVML.cmake")
-  list(APPEND ctk_libraries nvbench::nvml)
-endif()
-
+# Libhipcxx
+include("${CMAKE_CURRENT_LIST_DIR}/NVBenchLibhipcxx.cmake")
+list(APPEND ctk_libraries libhipcxx::libhipcxx hip::host)
 ################################################################################
-# CUDAToolkit -> CUPTI
-if (NVBench_ENABLE_CUPTI)
-  include("${CMAKE_CURRENT_LIST_DIR}/NVBenchCUPTI.cmake")
-  list(APPEND ctk_libraries CUDA::cuda_driver nvbench::cupti)
-endif()

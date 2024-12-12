@@ -1,5 +1,5 @@
 /*
- *  Copyright 2021 NVIDIA Corporation
+ *  Copyright 2021 NVIDIA Corporation 
  *
  *  Licensed under the Apache License, Version 2.0 with the LLVM exception
  *  (the "License"); you may not use this file except in compliance with
@@ -16,17 +16,35 @@
  *  limitations under the License.
  */
 
+
+// MIT License
+// Modifications Copyright (c) 2024 Advanced Micro Devices, Inc.
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+
 #pragma once
 
-#include <nvbench/detail/transform_reduce.cuh>
 #include <nvbench/types.cuh>
+
+#include <nvbench/detail/transform_reduce.cuh>
 
 #include <cmath>
 #include <functional>
 #include <iterator>
 #include <limits>
-#include <numeric>
-
 #include <type_traits>
 
 namespace nvbench::detail::statistics
@@ -42,8 +60,7 @@ ValueType standard_deviation(Iter first, Iter last, ValueType mean)
 {
   static_assert(std::is_floating_point_v<ValueType>);
 
-  const auto num = std::distance(first, last);
-
+  const auto num = last - first;
   if (num < 5) // don't bother with low sample sizes.
   {
     return std::numeric_limits<ValueType>::infinity();
@@ -58,91 +75,8 @@ ValueType standard_deviation(Iter first, Iter last, ValueType mean)
                                                             val *= val;
                                                             return val;
                                                           }) /
-                        static_cast<ValueType>((num - 1)); // Bessel’s correction
+                        static_cast<ValueType>((num - 1));
   return std::sqrt(variance);
-}
-
-/**
- * Computes linear regression and returns the slope and intercept
- *
- * If the input has fewer than 2 samples, infinity is returned for both slope and intercept.
- */
-template <class It>
-std::pair<nvbench::float64_t, nvbench::float64_t> compute_linear_regression(It first, It last)
-{
-  const std::size_t n = static_cast<std::size_t>(std::distance(first, last));
-
-  if (n < 2)
-  {
-    return std::make_pair(std::numeric_limits<nvbench::float64_t>::infinity(),
-                          std::numeric_limits<nvbench::float64_t>::infinity());
-  }
-
-  // Assuming x starts from 0
-  const nvbench::float64_t mean_x = (static_cast<nvbench::float64_t>(n) - 1.0) / 2.0;
-  const nvbench::float64_t mean_y = std::accumulate(first, last, 0.0) / static_cast<nvbench::float64_t>(n);
-
-  // Calculate the numerator and denominator for the slope
-  nvbench::float64_t numerator = 0.0;
-  nvbench::float64_t denominator = 0.0;
-
-  for (std::size_t i = 0; i < n; ++i, ++first)
-  {
-    const nvbench::float64_t x_diff = static_cast<nvbench::float64_t>(i) - mean_x;
-    numerator += x_diff * (*first - mean_y);
-    denominator += x_diff * x_diff;
-  }
-
-  // Calculate the slope and intercept
-  const nvbench::float64_t slope = numerator / denominator;
-  const nvbench::float64_t intercept = mean_y - slope * mean_x;
-
-  return std::make_pair(slope, intercept);
-}
-
-/**
- * Computes and returns the R^2 (coefficient of determination)
- */ 
-template <class It>
-nvbench::float64_t compute_r2(It first, It last, nvbench::float64_t slope, nvbench::float64_t intercept)
-{
-  const std::size_t n = static_cast<std::size_t>(std::distance(first, last));
-
-  const nvbench::float64_t mean_y = std::accumulate(first, last, 0.0) / static_cast<nvbench::float64_t>(n);
-
-  nvbench::float64_t ss_tot = 0.0;
-  nvbench::float64_t ss_res = 0.0;
-
-  for (std::size_t i = 0; i < n; ++i, ++first)
-  {
-    const nvbench::float64_t y = *first;
-    const nvbench::float64_t y_pred = slope * static_cast<nvbench::float64_t>(i) + intercept;
-
-    ss_tot += (y - mean_y) * (y - mean_y);
-    ss_res += (y - y_pred) * (y - y_pred);
-  }
-
-  if (ss_tot == 0.0)
-  {
-    return 1.0;
-  }
-
-  return 1.0 - ss_res / ss_tot;
-}
-
-inline nvbench::float64_t rad2deg(nvbench::float64_t rad)
-{
-  return rad * 180.0 / M_PI;
-}
-
-inline nvbench::float64_t slope2rad(nvbench::float64_t slope)
-{
-  return std::atan2(slope, 1.0);
-}
-
-inline nvbench::float64_t slope2deg(nvbench::float64_t slope)
-{
-  return rad2deg(slope2rad(slope));
 }
 
 } // namespace nvbench::detail::statistics

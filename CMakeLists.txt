@@ -1,5 +1,22 @@
-# 3.23.1 required for rapids-cmake
-cmake_minimum_required(VERSION 3.23.1)
+# Modifications Copyright (c) 2024 Advanced Micro Devices, Inc.
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+
+# 3.20.1 required for rapids-cmake
+cmake_minimum_required(VERSION 3.20.1)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CUDA_STANDARD 17)
@@ -15,31 +32,25 @@ include(cmake/NVBenchRapidsCMake.cmake)
 nvbench_load_rapids_cmake()
 
 project(NVBench
-  LANGUAGES CUDA CXX
+  LANGUAGES CXX HIP
   VERSION 0.1.0
 )
 
 nvbench_init_rapids_cmake()
 
+# prescribe dependencies
+include(cpm/package_override)
+rapids_cpm_package_override(${CMAKE_CURRENT_LIST_DIR}/versions.json)
+
 # See NVIDIA/NVBench#52
-find_package(CUDAToolkit REQUIRED)
-set(cupti_default ON)
-if (${CUDAToolkit_VERSION} VERSION_LESS 11.3)
-  set(cupti_default OFF)
-endif()
+find_package(HIP REQUIRED)
 
-option(BUILD_SHARED_LIBS "Build NVBench as a shared library" ON)
-
-option(NVBench_ENABLE_NVML "Build with NVML support from the Cuda Toolkit." ON)
-option(NVBench_ENABLE_CUPTI "Build NVBench with CUPTI." ${cupti_default})
-
-option(NVBench_ENABLE_TESTING "Build NVBench testing suite." OFF)
+option(NVBench_ENABLE_TESTING "Build NVBench testing suite." ON)
 option(NVBench_ENABLE_DEVICE_TESTING
   "Include tests that require a GPU (with locked clocks)."
   OFF
 )
 option(NVBench_ENABLE_EXAMPLES "Build NVBench examples." OFF)
-option(NVBench_ENABLE_INSTALL_RULES "Install NVBench." ${NVBench_TOPLEVEL_PROJECT})
 
 include(cmake/NVBenchConfigTarget.cmake)
 include(cmake/NVBenchDependentDlls.cmake)
@@ -48,7 +59,14 @@ include(cmake/NVBenchWriteConfigHeader.cmake)
 include(cmake/NVBenchDependencies.cmake)
 include(cmake/NVBenchInstallRules.cmake)
 include(cmake/NVBenchUtilities.cmake)
+include(cmake/NVBenchLibhipcxx.cmake)
 
+# synchronize HIP and CUDA architectures
+if (DEFINED CMAKE_HIP_ARCHITECTURES AND NOT CMAKE_CUDA_ARCHITECTURES)
+  set(CMAKE_CUDA_ARCHITECTURES ${CMAKE_HIP_ARCHITECTURES})
+elseif (DEFINED CMAKE_CUDA_ARCHITECTURES AND NOT CMAKE_HIP_ARCHITECTURES)
+  set(CMAKE_HIP_ARCHITECTURES ${CMAKE_CUDA_ARCHITECTURES})
+endif()
 message(STATUS "NVBench CUDA architectures: ${CMAKE_CUDA_ARCHITECTURES}")
 
 add_subdirectory(nvbench)

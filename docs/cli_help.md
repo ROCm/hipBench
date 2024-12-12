@@ -1,3 +1,22 @@
+
+// MIT License
+// Modifications Copyright (c) 2024 Advanced Micro Devices, Inc.
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+
 # Queries
 
 * `--list`, `-l`
@@ -89,15 +108,8 @@
   * Applies to the most recent `--benchmark`, or all benchmarks if specified
     before any `--benchmark` arguments.
 
-* `--stopping-criterion <criterion>`
-  * After `--min-samples` is satisfied, use `<criterion>` to detect if enough 
-    samples were collected.
-  * Only applies to Cold measurements.
-  * Default is stdrel (`--stopping-criterion stdrel`)
-
 * `--min-time <seconds>`
   * Accumulate at least `<seconds>` of execution time per measurement.
-  * Only applies to `stdrel` stopping criterion.
   * Default is 0.5 seconds.
   * If both GPU and CPU times are gathered, this applies to GPU time only.
   * Applies to the most recent `--benchmark`, or all benchmarks if specified
@@ -107,7 +119,6 @@
   * Gather samples until the error in the measurement drops below `<value>`.
   * Noise is specified as the percent relative standard deviation.
   * Default is 0.5% (`--max-noise 0.5`)
-  * Only applies to `stdrel` stopping criterion.
   * Only applies to Cold measurements.
   * If both GPU and CPU times are gathered, this applies to GPU noise only.
   * Applies to the most recent `--benchmark`, or all benchmarks if specified

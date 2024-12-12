@@ -1,13 +1,29 @@
+# Modifications Copyright (c) 2024 Advanced Micro Devices, Inc.
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+
 set(example_srcs
-  auto_throughput.cu
-  axes.cu
-  custom_criterion.cu
-  enums.cu
-  exec_tag_sync.cu
-  exec_tag_timer.cu
-  skip.cu
-  stream.cu
-  throughput.cu
+  axes.hip
+  enums.hip
+  exec_tag_sync.hip
+  exec_tag_timer.hip
+  skip.hip
+  stream.hip
+  throughput.hip
+  auto_throughput.hip
 )
 
 # Metatarget for all examples:
@@ -38,15 +54,3 @@ set(thrust_examples
   skip
   throughput
 )
-foreach (example IN LISTS thrust_examples)
-  if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    # C4324: structure was padded due to alignment specifier
-    nvbench_add_cxx_flag(nvbench.example.${example} PRIVATE "/wd4324")
-
-    # warning C4201: nonstandard extension used: nameless struct/union:
-    # Fixed in Thrust 1.12.0 (CTK 11.4, NV HPC 21.3)
-    if (${CUDAToolkit_VERSION} VERSION_LESS 11.4)
-      nvbench_add_cxx_flag(nvbench.example.${example} PRIVATE "/wd4201")
-    endif()
-  endif()
-endforeach()
