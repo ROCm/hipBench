@@ -19,7 +19,16 @@
 
 # Overview
 
+> [!CAUTION] 
+> This release is an *early-access* software technology preview. Running production workloads is *not* recommended.
+***
+
+> [!NOTE]
+> This README is derived from the original nvbench project's README. More care is necessary to remove/modify parts that are only applicable to the original version.
+
 This project is a work-in-progress. Everything is subject to change.
+hipBench is an open source project. It is derived from 
+[NVBench](https://github.com/NVIDIA/nvbench).
 
 hipBench is a C++17 library designed to simplify HIP kernel benchmarking. It
 features:
@@ -29,7 +38,7 @@ features:
   be dynamic numbers/strings or [static types](docs/benchmarks.md#type-axes).
 * [Runtime customization](docs/cli_help.md): A rich command-line interface
   allows [redefinition of parameter axes](docs/cli_help_axis.md), CUDA/AMD device
-  selection, locking GPU clocks (Volta+), changing output formats, and more.
+  selection, locking GPU clocks, changing output formats, and more.
 * [Throughput calculations](docs/benchmarks.md#throughput-measurements): Compute
   and report:
   * Item throughput (elements/second)
@@ -53,6 +62,12 @@ features:
 - clang++: 9 -> 18
 - cl.exe: 2019 -> 2022 (19.29, 29.39)
 - Headers are tested with C++17 -> C++20.
+
+# Known limitations
+
+Generally, we aim for feature parity with NVBench.
+Currently, we do not support CUDA devices with HIP's CUDA backend.
+If this feature is relevant to your project, please let us know by opening a feature request on Github.
 
 # Getting Started
 
@@ -156,8 +171,6 @@ of investment.
 # Contributing
 
 Contributions are welcome!
-
-For current issues, see the [issue board](https://github.com/NVIDIA/nvbench/issues). Issues labeled with [![](https://img.shields.io/github/labels/NVIDIA/nvbench/good%20first%20issue)](https://github.com/NVIDIA/nvbench/labels/good%20first%20issue) are good for first time contributors.
 
 ## Tests
 
