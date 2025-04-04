@@ -139,7 +139,6 @@ add_dependencies(nvbench.all nvbench.main)
 add_library(nvbench::nvbench ALIAS nvbench)
 add_library(nvbench::main ALIAS nvbench.main)
 
-nvbench_setup_dep_dlls(nvbench)
 nvbench_install_libraries(nvbench nvbench.main nvbench.build_interface)
 
 # hipbench extra targets

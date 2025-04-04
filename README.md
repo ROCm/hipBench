@@ -52,7 +52,7 @@ features:
 
 # Supported Compilers and Tools
 
-- CMake > 2.23.1
+- CMake > 3.30.4
 - ROCm == 7.0.2
 - g++: 7 -> 12
 - clang++: 9 -> 20
