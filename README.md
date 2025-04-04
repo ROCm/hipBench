@@ -49,6 +49,9 @@ features:
   * Batch Measurements:
     * Executes the benchmark multiple times back-to-back and records total time.
     * Reports the average execution time (total time / number of executions).
+  * [CPU-only Measurements](docs/benchmarks.md#cpu-only-benchmarks)
+    * Measures the host-side execution time of a non-GPU benchmark.
+    * Not suitable for microbenchmarking.
 
 # Supported Compilers and Tools
 
@@ -96,6 +99,7 @@ This repository provides a number of [examples](examples/) that demonstrate
 various hipBench features and usecases:
 
 - [Runtime and compile-time parameter sweeps](examples/axes.cu)
+- [CPU-only benchmarking](examples/cpu_only.cu)
 - [Enums and compile-time-constant-integral parameter axes](examples/enums.cu)
 - [Reporting item/sec and byte/sec throughput statistics](examples/throughput.cu)
 - [Skipping benchmark configurations](examples/skip.cu)
@@ -201,6 +205,7 @@ hipBench will measure the CPU and AMD GPU execution time of a ***single
 host-side critical region*** per benchmark. It is intended for regression
 testing and parameter tuning of individual kernels.
 
-hipBench is focused on evaluating the performance of HIP kernels and is not
-optimized for CPU microbenchmarks. This may change in the future, but for now,
+hipBench is focused on evaluating the performance of HIP kernels. It also provides
+CPU-only benchmarking facilities intended for non-trivial CPU workloads, but is
+not optimized for CPU microbenchmarks. This may change in the future, but for now,
 consider using Google Benchmark for high resolution CPU benchmarks.
