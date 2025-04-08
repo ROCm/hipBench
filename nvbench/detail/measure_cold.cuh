@@ -52,6 +52,7 @@
 #include <nvbench/detail/kernel_launcher_timer_wrapper.cuh>
 #include <nvbench/detail/l2flush.cuh>
 #include <nvbench/detail/statistics.cuh>
+#include <nvbench/detail/gpu_frequency.cuh>
 
 #include <nvbench/cuda_runtime.h>
 
@@ -86,6 +87,8 @@ protected:
   bool is_finished();
   void run_trials_epilogue();
   void generate_summaries();
+  void gpu_frequency_start() { m_gpu_frequency.start(m_launch.get_stream()); }
+  void gpu_frequency_stop() { m_gpu_frequency.stop(m_launch.get_stream()); }
 
   void check_skip_time(nvbench::float64_t warmup_time);
 
@@ -110,6 +113,7 @@ protected:
 
   nvbench::criterion_params m_criterion_params;
   nvbench::stopping_criterion_base& m_stopping_criterion;
+  nvbench::detail::gpu_frequency m_gpu_frequency;
 
   bool m_disable_blocking_kernel{false};
   bool m_run_once{false};
@@ -118,6 +122,10 @@ protected:
 
   nvbench::float64_t m_skip_time{};
   nvbench::float64_t m_timeout{};
+
+  nvbench::float32_t m_throttle_threshold{0.75f};     // [% of peak SM clock rate]
+  nvbench::float32_t m_throttle_recovery_delay{0.0f}; // [seconds]
+  bool m_discard_on_throttle{false};
 
   nvbench::int64_t m_total_samples{};
 
@@ -150,6 +158,10 @@ struct measure_cold_base::kernel_launch_timer
     {
       m_measure.block_stream();
     }
+    if (!m_measure.m_run_once)
+    {
+      m_measure.gpu_frequency_start();
+    }
     m_measure.m_cuda_timer.start(m_measure.m_launch.get_stream());
     if (m_disable_blocking_kernel)
     {
@@ -164,6 +176,10 @@ struct measure_cold_base::kernel_launch_timer
     {
       m_measure.m_cpu_timer.start();
       m_measure.unblock_stream();
+    }
+    if (!m_measure.m_run_once)
+    {
+      m_measure.gpu_frequency_stop();
     }
     m_measure.sync_stream();
     m_measure.m_cpu_timer.stop();
