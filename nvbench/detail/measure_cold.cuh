@@ -58,6 +58,7 @@
 
 #include <utility>
 #include <vector>
+#include "nvbench/types.cuh"
 
 namespace nvbench
 {
@@ -139,6 +140,7 @@ protected:
 
   std::vector<nvbench::float64_t> m_cuda_times;
   std::vector<nvbench::float64_t> m_cpu_times;
+  std::vector<nvbench::float32_t> m_sm_clock_rates;
 
   bool m_max_time_exceeded{};
 };
