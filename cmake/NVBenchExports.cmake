@@ -69,5 +69,38 @@ macro(nvbench_generate_exports)
       LANGUAGES HIP CXX
       FINAL_CODE_BLOCK nvbench_install_export_code_block
     )
+
+    # hipbench package provides hipbench:: and nvbench:: targets
+    set(nvbench_targets nvbench main ctl internal_build_interface)
+    set(hipbench_global_targets "")
+    foreach(target ${nvbench_targets})
+      list(APPEND hipbench_global_targets nvbench_${target} hipbench_${target})
+      add_library(nvbench_${target} INTERFACE)
+      add_library(hipbench_${target} INTERFACE)
+      set_target_properties(nvbench_${target} PROPERTIES EXPORT_NAME nvbench::${target})
+      if (${target} STREQUAL "nvbench")
+        set_target_properties(hipbench_${target} PROPERTIES EXPORT_NAME hipbench::hipbench)
+        target_link_libraries(nvbench_${target} INTERFACE nvbench)
+        target_link_libraries(hipbench_${target} INTERFACE nvbench)
+      else()
+        set_target_properties(hipbench_${target} PROPERTIES EXPORT_NAME hipbench::${target})
+        target_link_libraries(nvbench_${target} INTERFACE nvbench.${target})
+        target_link_libraries(hipbench_${target} INTERFACE nvbench.${target})
+      endif()
+    endforeach()
+    nvbench_install_libraries(${hipbench_global_targets})
+
+    rapids_export(BUILD hipBench
+      EXPORT_SET nvbench-targets
+      GLOBAL_TARGETS ${hipbench_global_targets}
+      LANGUAGES HIP CXX
+      FINAL_CODE_BLOCK nvbench_build_export_code_block
+    )
+    rapids_export(INSTALL hipBench
+      EXPORT_SET nvbench-targets
+      GLOBAL_TARGETS ${hipbench_global_targets}
+      LANGUAGES HIP CXX
+      FINAL_CODE_BLOCK nvbench_install_export_code_block
+    )
   endif()
 endmacro()

@@ -38,10 +38,11 @@
 function(find_and_configure_libhipcxx)
   include(${rapids-cmake-dir}/cpm/libhipcxx.cmake)
 
-  rapids_cpm_libhipcxx(
-    BUILD_EXPORT_SET nvbench-targets
-    INSTALL_EXPORT_SET nvbench-targets
-  )
+  set(export_sets BUILD_EXPORT_SET nvbench-targets)
+  if(NOT ${NVBench_DISABLE_INSTALL_CPM_DOWNLOADS})
+    list(APPEND export_sets INSTALL_EXPORT_SET nvbench-targets)
+  endif()
+  rapids_cpm_libhipcxx(${export_sets})
 
 endfunction()
 

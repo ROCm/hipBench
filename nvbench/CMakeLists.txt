@@ -142,6 +142,11 @@ add_library(nvbench::main ALIAS nvbench.main)
 nvbench_setup_dep_dlls(nvbench)
 nvbench_install_libraries(nvbench nvbench.main nvbench.build_interface)
 
+# hipbench extra targets
+# support add_subdirectory
+add_library(hipbench::hipbench ALIAS nvbench)
+add_library(hipbench::main ALIAS nvbench.main)
+
 # nvcc emits several unavoidable warnings while compiling nlohmann_json:
 if (json_is_cu)
   set_property(SOURCE ${json_printer_impl} APPEND PROPERTY COMPILE_OPTIONS

@@ -71,6 +71,11 @@ option(NVBench_ENABLE_DEVICE_TESTING
 )
 option(NVBench_ENABLE_EXAMPLES "Build NVBench examples." OFF)
 option(NVBench_ENABLE_INSTALL_RULES "Install NVBench." ${NVBench_TOPLEVEL_PROJECT})
+option(NVBench_DISABLE_INSTALL_CPM_DOWNLOADS
+  "Do NOT install/package dependencies DOWNLOADED by CPM together with this project.
+  This has only an effect on packages downloaded by CPM not those that CPM has found locally."
+  OFF
+)
 
 include(cmake/NVBenchUtilities.cmake) # Must be first
 include(cmake/NVBenchClangdCompileInfo.cmake) # Must be before any targets are created
@@ -115,3 +120,5 @@ if (NVBench_ENABLE_HEADER_TESTING)
 endif()
 
 nvbench_generate_exports()
+
+include(cmake/NVBenchPackaging.cmake)
