@@ -42,7 +42,6 @@
 #pragma once
 
 #include <nvbench/cuda_call.cuh>
-
 #include <nvbench/types.cuh>
 
 #include <nvbench/cuda_runtime_api.h>

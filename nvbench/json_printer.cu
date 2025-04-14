@@ -16,46 +16,21 @@
  *  limitations under the License.
  */
 
-
-// MIT License
-//
-// Modifications Copyright (C) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
-
-#include <nvbench/json_printer.cuh>
-
 #include <nvbench/axes_metadata.cuh>
 #include <nvbench/benchmark_base.cuh>
 #include <nvbench/config.cuh>
+#include <nvbench/detail/throw.cuh>
 #include <nvbench/device_info.cuh>
 #include <nvbench/device_manager.cuh>
 #include <nvbench/git_revision.cuh>
+#include <nvbench/json_printer.cuh>
 #include <nvbench/state.cuh>
 #include <nvbench/summary.cuh>
 #include <nvbench/version.cuh>
 
-#include <nvbench/detail/throw.cuh>
+#include <nlohmann/json.hpp>
 
 #include <fmt/format.h>
-
-#include <nlohmann/json.hpp>
 
 #include <cstdint>
 #include <fstream>
@@ -128,7 +103,7 @@ void write_named_values(JsonNode &node, const nvbench::named_values &values)
       default:
         NVBENCH_THROW(std::runtime_error, "{}", "Unrecognized value type.");
     } // end switch (value type)
-  }   // end foreach value name
+  } // end foreach value name
 }
 
 } // end namespace
@@ -333,8 +308,8 @@ void json_printer::do_print_benchmark_results(const benchmark_vector &benches)
           false;
 #endif
       } // "nvbench"
-    }   // "version"
-  }     // "meta"
+    } // "version"
+  } // "meta"
 
   add_devices_section(root);
 
@@ -397,8 +372,8 @@ void json_printer::do_print_benchmark_results(const benchmark_vector &benches)
             default:
               break;
           } // end switch (axis type)
-        }   // end foreach axis value
-      }     // end foreach axis
+        } // end foreach axis value
+      } // end foreach axis
 
       auto &states = bench["states"];
       for (const auto &exec_state : bench_ptr->get_states())
@@ -466,8 +441,8 @@ void json_printer::do_print_benchmark_results(const benchmark_vector &benches)
           continue;
         }
       } // end foreach exec_state
-    }   // end foreach benchmark
-  }     // "benchmarks"
+    } // end foreach benchmark
+  } // "benchmarks"
 
   m_ostream << root.dump(2) << "\n";
 }
@@ -527,7 +502,7 @@ void json_printer::do_print_benchmark_list(const benchmark_vector &benches)
           default:
             break;
         } // end switch (axis type)
-      }   // end foreach axis value
+      } // end foreach axis value
     }
   } // end foreach bench
 

@@ -40,8 +40,6 @@
 
 #pragma once
 
-#include <cuda_runtime_api.h>
-
 #include <nvbench/config.cuh>
 #include <nvbench/cuda_call.cuh>
 #include <nvbench/detail/device_scope.cuh>
@@ -50,9 +48,8 @@
 
 #include <cstdint> // CHAR_BIT
 #include <stdexcept>
-#include <utility>
-
 #include <string_view>
+#include <utility>
 
 // forward declare this for internal storage
 struct nvmlDevice_st;

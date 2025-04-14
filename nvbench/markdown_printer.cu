@@ -16,37 +16,12 @@
  *  limitations under the License.
  */
 
-
-// MIT License
-//
-// Modifications Copyright (C) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
-
-#include <nvbench/markdown_printer.cuh>
-
 #include <nvbench/benchmark_base.cuh>
 #include <nvbench/device_manager.cuh>
+#include <nvbench/internal/markdown_table.cuh>
+#include <nvbench/markdown_printer.cuh>
 #include <nvbench/state.cuh>
 #include <nvbench/summary.cuh>
-
-#include <nvbench/internal/markdown_table.cuh>
 
 #include <fmt/color.h>
 #include <fmt/format.h>
@@ -121,8 +96,12 @@ void markdown_printer::do_print_device_info()
                    "* Max Shared Memory: {} KiB/SM, {} KiB/Block\n",
                    device.get_shared_memory_per_sm() / 1024,
                    device.get_shared_memory_per_block() / 1024);
-    fmt::format_to(std::back_inserter(buffer), "* L2 Cache Size: {} KiB\n", device.get_l2_cache_size() / 1024);
-    fmt::format_to(std::back_inserter(buffer), "* Maximum Active Blocks: {}/SM\n", device.get_max_blocks_per_sm());
+    fmt::format_to(std::back_inserter(buffer),
+                   "* L2 Cache Size: {} KiB\n",
+                   device.get_l2_cache_size() / 1024);
+    fmt::format_to(std::back_inserter(buffer),
+                   "* Maximum Active Blocks: {}/SM\n",
+                   device.get_max_blocks_per_sm());
     fmt::format_to(std::back_inserter(buffer),
                    "* Maximum Active Threads: {}/SM, {}/Block\n",
                    device.get_max_threads_per_sm(),
@@ -132,7 +111,9 @@ void markdown_printer::do_print_device_info()
                    device.get_registers_per_sm(),
                    device.get_registers_per_block());
 #endif
-    fmt::format_to(std::back_inserter(buffer), "* ECC Enabled: {}\n", device.get_ecc_state() ? "Yes" : "No");
+    fmt::format_to(std::back_inserter(buffer),
+                   "* ECC Enabled: {}\n",
+                   device.get_ecc_state() ? "Yes" : "No");
     fmt::format_to(std::back_inserter(buffer), "\n");
   }
   m_ostream << fmt::to_string(buffer);
@@ -241,9 +222,12 @@ void markdown_printer::do_print_benchmark_list(const printer_base::benchmark_vec
         {
           desc = fmt::format(" ({})", desc);
         }
-        fmt::format_to(std::back_inserter(buffer), "  * `{}`{}\n", axis_ptr->get_input_string(i), desc);
+        fmt::format_to(std::back_inserter(buffer),
+                       "  * `{}`{}\n",
+                       axis_ptr->get_input_string(i),
+                       desc);
       } // end foreach value
-    }   // end foreach axis
+    } // end foreach axis
     fmt::format_to(std::back_inserter(buffer), "\n");
   } // end foreach bench
 

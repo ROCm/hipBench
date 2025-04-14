@@ -24,15 +24,14 @@
 
 #include "test_asserts.cuh"
 
-
 namespace
 {
-    __global__ void multiply5(const int32_t* __restrict__ a, int32_t* __restrict__ b)
-    {
-      const auto id = blockIdx.x * blockDim.x + threadIdx.x;
-      b[id] = 5 * a[id];
-    }
+__global__ void multiply5(const int32_t *__restrict__ a, int32_t *__restrict__ b)
+{
+  const auto id = blockIdx.x * blockDim.x + threadIdx.x;
+  b[id]         = 5 * a[id];
 }
+} // namespace
 
 int main()
 { 

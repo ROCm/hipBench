@@ -52,13 +52,14 @@
 #include <nvbench/exec_tag.cuh>
 #include <nvbench/launch.cuh>
 #include <nvbench/stopping_criterion.cuh>
+#include <nvbench/types.cuh>
+
+#include <cuda_runtime.h>
 
 #include <nvbench/cuda_runtime.h>
 
 #include <utility>
 #include <vector>
-
-#include "nvbench/types.cuh"
 
 namespace nvbench
 {
