@@ -32,13 +32,18 @@ macro(nvbench_load_rapids_cmake)
     list(APPEND CMAKE_MODULE_PATH "${RAPIDS_CMAKE_MODULE_PATH}")
   else()
     if(NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/NVBENCH_RAPIDS.cmake)
+      if(DEFINED ENV{RAPIDS_CMAKE_SCRIPT_REPO})
+        set(RAPIDS_CMAKE_SCRIPT_REPO "$ENV{RAPIDS_CMAKE_SCRIPT_REPO}")
+      else()
+        set(RAPIDS_CMAKE_SCRIPT_REPO ROCm-DS/ROCmDS-CMake)
+      endif()
       if(DEFINED ENV{RAPIDS_CMAKE_SCRIPT_BRANCH})
         set(RAPIDS_CMAKE_SCRIPT_BRANCH "$ENV{RAPIDS_CMAKE_SCRIPT_BRANCH}")
       else()
-        set(RAPIDS_CMAKE_SCRIPT_BRANCH branch-24.06)
+        set(RAPIDS_CMAKE_SCRIPT_BRANCH release/1.0.x)
       endif()
 
-      set(URL "https://raw.githubusercontent.com/ROCm/rapids-cmake/${RAPIDS_CMAKE_SCRIPT_BRANCH}/RAPIDS.cmake")
+      set(URL "https://raw.githubusercontent.com/${RAPIDS_CMAKE_SCRIPT_REPO}/${RAPIDS_CMAKE_SCRIPT_BRANCH}/RAPIDS.cmake")
       file(DOWNLOAD ${URL}
         ${CMAKE_CURRENT_BINARY_DIR}/NVBENCH_RAPIDS.cmake
         STATUS DOWNLOAD_STATUS
