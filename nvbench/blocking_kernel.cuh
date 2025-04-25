@@ -1,5 +1,5 @@
 /*
- *  Copyright 2021 NVIDIA Corporation
+ *  Copyright 2021 NVIDIA Corporation 
  *
  *  Licensed under the Apache License, Version 2.0 with the LLVM exception
  *  (the "License"); you may not use this file except in compliance with
@@ -16,6 +16,25 @@
  *  limitations under the License.
  */
 
+
+// MIT License
+// Modifications Copyright (c) 2024 Advanced Micro Devices, Inc.
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+
 #pragma once
 
 #include <nvbench/types.cuh>
@@ -23,7 +42,7 @@
 namespace nvbench
 {
 
-struct cuda_stream;
+struct hip_stream;
 
 /**
  * Blocks a CUDA stream -- many sharp edges, read docs carefully.
@@ -36,9 +55,9 @@ struct cuda_stream;
  * the following pattern for timing a kernel launch:
  *
  * ```
- * NVBENCH_CUDA_CALL(cudaEventRecord(start_event));
+ * NVBENCH_CUDA_CALL(hipEventRecord(start_event));
  * my_kernel<<<...>>>();
- * NVBENCH_CUDA_CALL(cudaEventRecord(stop_event));
+ * NVBENCH_CUDA_CALL(hipEventRecord(stop_event));
  * ```
  *
  * The `start_event` may be recorded a non-trivial amount of time before
@@ -50,9 +69,9 @@ struct cuda_stream;
  * blocking_kernel blocker;
  * blocker.block(stream);
  *
- * NVBENCH_CUDA_CALL(cudaEventRecord(start_event));
+ * NVBENCH_CUDA_CALL(hipEventRecord(start_event));
  * my_kernel<<<...>>>();
- * NVBENCH_CUDA_CALL(cudaEventRecord(stop_event))
+ * NVBENCH_CUDA_CALL(hipEventRecord(stop_event))
  *
  * blocker.unblock();
  * ```
@@ -74,7 +93,7 @@ struct cuda_stream;
  *   - Do tests and schedule conservatively (~32 kernel launches max).
  * - This helper does NOT guarantee that the work submitted while blocking will
  *   execute uninterrupted.
- *   - Kernels on other streams may run between the `cudaEventRecord` calls
+ *   - Kernels on other streams may run between the `hipEventRecord` calls
  *     in the above example.
  */
 struct blocking_kernel
@@ -82,7 +101,7 @@ struct blocking_kernel
   blocking_kernel();
   ~blocking_kernel();
 
-  void block(const nvbench::cuda_stream &stream, nvbench::float64_t timeout);
+  void block(const nvbench::hip_stream &stream, nvbench::float64_t timeout);
 
   __forceinline__ void unblock()
   {

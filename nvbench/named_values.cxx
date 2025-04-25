@@ -1,5 +1,5 @@
 /*
- *  Copyright 2021 NVIDIA Corporation
+ *  Copyright 2021 NVIDIA Corporation 
  *
  *  Licensed under the Apache License, Version 2.0 with the LLVM exception
  *  (the "License"); you may not use this file except in compliance with
@@ -15,6 +15,25 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+
+
+// MIT License
+// Modifications Copyright (c) 2024 Advanced Micro Devices, Inc.
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
 
 #include <nvbench/named_values.cuh>
 
@@ -88,13 +107,9 @@ named_values::type named_values::get_type(const std::string &name) const
       {
         return nvbench::named_values::type::string;
       }
-      // warning C4702: unreachable code
-      // This is a future-proofing check, it'll be reachable if something breaks
-      NVBENCH_MSVC_PUSH_DISABLE_WARNING(4702)
       NVBENCH_THROW(std::runtime_error, "Unknown variant type for entry '{}'.", name);
     },
     this->get_value(name));
-  NVBENCH_MSVC_POP_WARNING()
 }
 
 nvbench::int64_t named_values::get_int64(const std::string &name) const

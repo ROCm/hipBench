@@ -1,5 +1,5 @@
 /*
- *  Copyright 2021 NVIDIA Corporation
+ *  Copyright 2021 NVIDIA Corporation 
  *
  *  Licensed under the Apache License, Version 2.0 with the LLVM exception
  *  (the "License"); you may not use this file except in compliance with
@@ -15,6 +15,25 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+
+
+// MIT License
+// Modifications Copyright (c) 2024 Advanced Micro Devices, Inc.
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
 
 #pragma once
 
@@ -38,8 +57,8 @@ enum class exec_flag
   modifier_mask = timer | no_block | sync | run_once,
 
   // Measurement types:
-  cold         = 0x0100, // measure_cold
-  hot          = 0x0200, // measure_hot
+  cold         = 0x0100, // measure_hot
+  hot          = 0x0200, // measure_cold
   measure_mask = cold | hot
 };
 
@@ -121,8 +140,5 @@ constexpr inline auto timer = nvbench::exec_tag::impl::timer;
 /// Modifier used to indicate that the KernelGenerator will perform CUDA
 /// synchronizations. Without this flag such benchmarks will deadlock.
 constexpr inline auto sync = nvbench::exec_tag::impl::no_block | nvbench::exec_tag::impl::sync;
-
-/// Modifier used to indicate that batched measurements should be disabled
-constexpr inline auto no_batch = nvbench::exec_tag::impl::cold;
 
 } // namespace nvbench::exec_tag

@@ -1,5 +1,6 @@
 /*
  *  Copyright 2021-2022 NVIDIA Corporation
+ *  Copyright 2021 NVIDIA Corporation 
  *
  *  Licensed under the Apache License, Version 2.0 with the LLVM exception
  *  (the "License"); you may not use this file except in compliance with
@@ -16,11 +17,30 @@
  *  limitations under the License.
  */
 
+
+// MIT License
+// Modifications Copyright (c) 2024 Advanced Micro Devices, Inc.
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+
 #pragma once
 
 #include <nvbench/cuda_call.cuh>
 
-#include <cuda_runtime_api.h>
+#include <hip/hip_runtime_api.h>
 
 #include <memory>
 
@@ -31,79 +51,79 @@ namespace nvbench
  * Manages and provides access to a CUDA stream.
  *
  * May be owning or non-owning. If the stream is owned, it will be freed with
- * `cudaStreamDestroy` when the `cuda_stream`'s lifetime ends. Non-owning
- * `cuda_stream`s are sometimes referred to as views.
+ * `hipStreamDestroy` when the `hip_stream`'s lifetime ends. Non-owning
+ * `hip_stream`s are sometimes referred to as views.
  *
  * @sa nvbench::make_cuda_stream_view
  */
-struct cuda_stream
+struct hip_stream
 {
   /**
-   * Constructs a cuda_stream that owns a new stream, created with
-   * `cudaStreamCreate`.
+   * Constructs a hip_stream that owns a new stream, created with
+   * `hipStreamCreate`.
    */
-  cuda_stream()
+  hip_stream()
       : m_stream{[]() {
-                   cudaStream_t s;
-                   NVBENCH_CUDA_CALL(cudaStreamCreate(&s));
+                   hipStream_t s;
+                   NVBENCH_CUDA_CALL(hipStreamCreate(&s));
                    return s;
                  }(),
                  stream_deleter{true}}
   {}
 
   /**
-   * Constructs a `cuda_stream` from an explicit cudaStream_t.
+   * Constructs a `hip_stream` from an explicit hipStream_t.
    *
-   * @param owning If true, `cudaStreamCreate(stream)` will be called from this
-   * `cuda_stream`'s destructor.
+   * @param owning If true, `hipStreamCreate(stream)` will be called from this
+   * `hip_stream`'s destructor.
    *
    * @sa nvbench::make_cuda_stream_view
    */
-  cuda_stream(cudaStream_t stream, bool owning)
+  hip_stream(hipStream_t stream, bool owning)
       : m_stream{stream, stream_deleter{owning}}
   {}
 
-  ~cuda_stream() = default;
+  ~hip_stream() = default;
 
   // move-only
-  cuda_stream(const cuda_stream &)            = delete;
-  cuda_stream &operator=(const cuda_stream &) = delete;
-  cuda_stream(cuda_stream &&)                 = default;
-  cuda_stream &operator=(cuda_stream &&)      = default;
+  hip_stream(const hip_stream &)            = delete;
+  hip_stream &operator=(const hip_stream &) = delete;
+  hip_stream(hip_stream &&)                 = default;
+  hip_stream &operator=(hip_stream &&)      = default;
 
   /**
-   * @return The `cudaStream_t` managed by this `cuda_stream`.
+   * @return The `hipStream_t` managed by this `hip_stream`.
    * @{
    */
-  operator cudaStream_t() const { return m_stream.get(); }
+  operator hipStream_t() const { return m_stream.get(); }
 
-  cudaStream_t get_stream() const { return m_stream.get(); }
+  hipStream_t get_stream() const { return m_stream.get(); }
   /**@}*/
 
 private:
   struct stream_deleter
   {
-    using pointer = cudaStream_t;
+    using pointer = hipStream_t;
     bool owning;
 
     constexpr void operator()(pointer s) const noexcept
     {
       if (owning)
       {
-        NVBENCH_CUDA_CALL_NOEXCEPT(cudaStreamDestroy(s));
+        NVBENCH_CUDA_CALL_NOEXCEPT(hipStreamDestroy(s));
       }
     }
   };
 
-  std::unique_ptr<cudaStream_t, stream_deleter> m_stream;
+  std::unique_ptr<hipStream_t, stream_deleter> m_stream;
 };
 
 /**
  * Creates a non-owning view of the specified `stream`.
  */
-inline nvbench::cuda_stream make_cuda_stream_view(cudaStream_t stream)
+inline nvbench::hip_stream make_cuda_stream_view(hipStream_t stream)
 {
-  return cuda_stream{stream, false};
+  return hip_stream{stream, false};
 }
 
 } // namespace nvbench

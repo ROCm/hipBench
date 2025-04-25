@@ -1,5 +1,6 @@
 /*
  *  Copyright 2021-2022 NVIDIA Corporation
+ *  Copyright 2021 NVIDIA Corporation 
  *
  *  Licensed under the Apache License, Version 2.0 with the LLVM exception
  *  (the "License"); you may not use this file except in compliance with
@@ -16,6 +17,25 @@
  *  limitations under the License.
  */
 
+
+// MIT License
+// Modifications Copyright (c) 2024 Advanced Micro Devices, Inc.
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+
 #pragma once
 
 #include <nvbench/cuda_stream.cuh>
@@ -24,7 +44,6 @@
 #include <nvbench/named_values.cuh>
 #include <nvbench/summary.cuh>
 #include <nvbench/types.cuh>
-#include <nvbench/stopping_criterion.cuh>
 
 #include <functional>
 #include <optional>
@@ -64,8 +83,8 @@ struct state
   state &operator=(const state &) = delete;
   state &operator=(state &&)      = default;
 
-  [[nodiscard]] const nvbench::cuda_stream &get_cuda_stream() const { return m_cuda_stream; }
-  void set_cuda_stream(nvbench::cuda_stream &&stream) { m_cuda_stream = std::move(stream); }
+  [[nodiscard]] const nvbench::hip_stream &get_cuda_stream() const { return m_cuda_stream; }
+  void set_cuda_stream(nvbench::hip_stream &&stream) { m_cuda_stream = std::move(stream); }
 
   /// The CUDA device associated with with this benchmark state. May be
   /// nullopt for CPU-only benchmarks.
@@ -123,17 +142,6 @@ struct state
   void set_min_samples(nvbench::int64_t min_samples) { m_min_samples = min_samples; }
   /// @}
 
-  [[nodiscard]] const nvbench::criterion_params &get_criterion_params() const
-  {
-    return m_criterion_params;
-  }
-
-  /// Control the stopping criterion for the measurement loop.
-  /// @{
-  [[nodiscard]] const std::string& get_stopping_criterion() const { return m_stopping_criterion; }
-  void set_stopping_criterion(std::string criterion) { m_stopping_criterion = std::move(criterion); }
-  /// @}
-
   /// If true, the benchmark is only run once, skipping all warmup runs and only
   /// executing a single non-batched measurement. This is intended for use with
   /// external profiling tools. @{
@@ -147,18 +155,16 @@ struct state
   void set_disable_blocking_kernel(bool v) { m_disable_blocking_kernel = v; }
   /// @}
 
-  /// Accumulate at least this many seconds of timing data per measurement. 
-  /// Only applies to `stdrel` stopping criterion. @{
-  [[nodiscard]] nvbench::float64_t get_min_time() const { return m_criterion_params.get_float64("min-time"); }
-  void set_min_time(nvbench::float64_t min_time) { m_criterion_params.set_float64("min-time", min_time); }
+  /// Accumulate at least this many seconds of timing data per measurement. @{
+  [[nodiscard]] nvbench::float64_t get_min_time() const { return m_min_time; }
+  void set_min_time(nvbench::float64_t min_time) { m_min_time = min_time; }
   /// @}
 
   /// Specify the maximum amount of noise if a measurement supports noise.
   /// Noise is the relative standard deviation:
-  /// `noise = stdev / mean_time`. 
-  /// Only applies to `stdrel` stopping criterion. @{
-  [[nodiscard]] nvbench::float64_t get_max_noise() const { return m_criterion_params.get_float64("max-noise"); }
-  void set_max_noise(nvbench::float64_t max_noise) { m_criterion_params.set_float64("max-noise", max_noise); }
+  /// `noise = stdev / mean_time`. @{
+  [[nodiscard]] nvbench::float64_t get_max_noise() const { return m_max_noise; }
+  void set_max_noise(nvbench::float64_t max_noise) { m_max_noise = max_noise; }
   /// @}
 
   /// If a warmup run finishes in less than `skip_time`, the measurement will
@@ -213,31 +219,11 @@ struct state
   void collect_loads_efficiency() { m_collect_loads_efficiency = true; }
   void collect_dram_throughput() { m_collect_dram_throughput = true; }
 
-  void collect_cupti_metrics()
-  {
-    collect_l1_hit_rates();
-    collect_l2_hit_rates();
-    collect_stores_efficiency();
-    collect_loads_efficiency();
-    collect_dram_throughput();
-  }
-
   [[nodiscard]] bool is_l1_hit_rate_collected() const { return m_collect_l1_hit_rates; }
   [[nodiscard]] bool is_l2_hit_rate_collected() const { return m_collect_l2_hit_rates; }
   [[nodiscard]] bool is_stores_efficiency_collected() const { return m_collect_stores_efficiency; }
   [[nodiscard]] bool is_loads_efficiency_collected() const { return m_collect_loads_efficiency; }
   [[nodiscard]] bool is_dram_throughput_collected() const { return m_collect_dram_throughput; }
-
-  [[nodiscard]] bool is_cupti_required() const
-  {
-    // clang-format off
-    return is_l2_hit_rate_collected() ||
-           is_l1_hit_rate_collected() ||
-           is_stores_efficiency_collected() ||
-           is_loads_efficiency_collected() ||
-           is_dram_throughput_collected();
-    // clang-format on
-  }
 
   summary &add_summary(std::string summary_tag);
   summary &add_summary(summary s);
@@ -275,7 +261,7 @@ private:
         std::optional<nvbench::device_info> device,
         std::size_t type_config_index);
 
-  nvbench::cuda_stream m_cuda_stream;
+  nvbench::hip_stream m_cuda_stream;
   std::reference_wrapper<const nvbench::benchmark_base> m_benchmark;
   nvbench::named_values m_axis_values;
   std::optional<nvbench::device_info> m_device;
@@ -284,11 +270,9 @@ private:
   bool m_run_once{false};
   bool m_disable_blocking_kernel{false};
 
-
-  nvbench::criterion_params m_criterion_params;
-  std::string m_stopping_criterion;
-
   nvbench::int64_t m_min_samples;
+  nvbench::float64_t m_min_time;
+  nvbench::float64_t m_max_noise;
 
   nvbench::float64_t m_skip_time;
   nvbench::float64_t m_timeout;

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2021 NVIDIA Corporation
+ *  Copyright 2021 NVIDIA Corporation 
  *
  *  Licensed under the Apache License, Version 2.0 with the LLVM exception
  *  (the "License"); you may not use this file except in compliance with
@@ -15,6 +15,25 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+
+
+// MIT License
+// Modifications Copyright (c) 2024 Advanced Micro Devices, Inc.
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
 
 #pragma once
 
@@ -60,8 +79,6 @@ struct json_printer : nvbench::printer_base
   [[nodiscard]] bool get_enable_binary_output() const { return m_enable_binary_output; }
   void set_enable_binary_output(bool b) { m_enable_binary_output = b; }
 
-  void print_devices_json();
-
 protected:
   // Virtual API from printer_base:
   void do_log_argv(const std::vector<std::string> &argv) override { m_argv = argv; }
@@ -70,7 +87,6 @@ protected:
                                     const std::string &hint,
                                     const std::vector<nvbench::float64_t> &data) override;
   void do_print_benchmark_results(const benchmark_vector &benches) override;
-  void do_print_benchmark_list(const benchmark_vector &) override;
 
   bool m_enable_binary_output{false};
   std::size_t m_num_jsonbin_files{};

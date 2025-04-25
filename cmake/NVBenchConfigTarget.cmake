@@ -1,3 +1,20 @@
+# Modifications Copyright (c) 2024 Advanced Micro Devices, Inc.
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+
 include(CheckCXXCompilerFlag)
 
 option(NVBench_ENABLE_WERROR
@@ -34,34 +51,24 @@ function(nvbench_add_cxx_flag target_name type flag)
   endif()
 endfunction()
 
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-  nvbench_add_cxx_flag(nvbench.build_interface INTERFACE "/W4")
+nvbench_add_cxx_flag(nvbench.build_interface INTERFACE "-Wall")
+nvbench_add_cxx_flag(nvbench.build_interface INTERFACE "-Wextra")
+nvbench_add_cxx_flag(nvbench.build_interface INTERFACE "-Wconversion")
+nvbench_add_cxx_flag(nvbench.build_interface INTERFACE "-Woverloaded-virtual")
+nvbench_add_cxx_flag(nvbench.build_interface INTERFACE "-Wcast-qual")
+nvbench_add_cxx_flag(nvbench.build_interface INTERFACE "-Wpointer-arith")
+nvbench_add_cxx_flag(nvbench.build_interface INTERFACE "-Wunused-local-typedef")
+nvbench_add_cxx_flag(nvbench.build_interface INTERFACE "-Wunused-parameter")
+nvbench_add_cxx_flag(nvbench.build_interface INTERFACE "-Wvla")
+nvbench_add_cxx_flag(nvbench.build_interface INTERFACE "-Wgnu")
 
-  if (NVBench_ENABLE_WERROR)
-    nvbench_add_cxx_flag(nvbench.build_interface INTERFACE "/WX")
-  endif()
-
-  # Suppress overly-pedantic/unavoidable warnings brought in with /W4:
-  # C4505: unreferenced local function has been removed
-  # The CUDA `host_runtime.h` header emits this for
-  # `__cudaUnregisterBinaryUtil`.
-  nvbench_add_cxx_flag(nvbench.build_interface INTERFACE "/wd4505")
-else()
-  nvbench_add_cxx_flag(nvbench.build_interface INTERFACE "-Wall")
-  nvbench_add_cxx_flag(nvbench.build_interface INTERFACE "-Wextra")
-  nvbench_add_cxx_flag(nvbench.build_interface INTERFACE "-Wconversion")
-  nvbench_add_cxx_flag(nvbench.build_interface INTERFACE "-Woverloaded-virtual")
-  nvbench_add_cxx_flag(nvbench.build_interface INTERFACE "-Wcast-qual")
-  nvbench_add_cxx_flag(nvbench.build_interface INTERFACE "-Wpointer-arith")
-  nvbench_add_cxx_flag(nvbench.build_interface INTERFACE "-Wunused-local-typedef")
-  nvbench_add_cxx_flag(nvbench.build_interface INTERFACE "-Wunused-parameter")
-  nvbench_add_cxx_flag(nvbench.build_interface INTERFACE "-Wvla")
-  nvbench_add_cxx_flag(nvbench.build_interface INTERFACE "-Wgnu")
-  nvbench_add_cxx_flag(nvbench.build_interface INTERFACE "-Wno-gnu-line-marker") # WAR 3916341
-
-  if (NVBench_ENABLE_WERROR)
-    nvbench_add_cxx_flag(nvbench.build_interface INTERFACE "-Werror")
-  endif()
+if (NVBench_ENABLE_WERROR)
+  nvbench_add_cxx_flag(nvbench.build_interface INTERFACE "-Werror")
+  nvbench_add_cxx_flag(nvbench.build_interface INTERFACE "-Wno-unused-private-field")
+  nvbench_add_cxx_flag(nvbench.build_interface INTERFACE "-Wno-conversion")
+  nvbench_add_cxx_flag(nvbench.build_interface INTERFACE "-Wno-bitwise-instead-of-logical")
+  nvbench_add_cxx_flag(nvbench.build_interface INTERFACE "-Wno-unused-variable")
+  nvbench_add_cxx_flag(nvbench.build_interface INTERFACE "-Wno-defaulted-function-deleted")
 endif()
 
 # GCC-specific flags
