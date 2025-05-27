@@ -30,11 +30,11 @@ if(NOT BUILD_SHARED_LIBS AND NVBench_ENABLE_INSTALL_RULES)
   set(install_fmt ON)
 endif()
 
-rapids_cpm_find(fmt 11.1.4 ${export_set_details}
+rapids_cpm_find(fmt 11.2.0 ${export_set_details}
   GLOBAL_TARGETS fmt::fmt fmt::fmt-header-only
   CPM_ARGS
     GIT_REPOSITORY "https://github.com/fmtlib/fmt.git"
-    GIT_TAG "11.1.4"
+    GIT_TAG "11.2.0"
     OPTIONS
       # Force static to keep fmt internal.
       "BUILD_SHARED_LIBS OFF"
@@ -55,11 +55,17 @@ endif()
 # Following recipe from
 # http://github.com/cpm-cmake/CPM.cmake/blob/master/examples/json/CMakeLists.txt
 # Download the zips because the repo takes an excessively long time to clone.
-rapids_cpm_find(nlohmann_json 3.11.3
+rapids_cpm_find(nlohmann_json 3.12.0
   CPM_ARGS
-    URL https://github.com/nlohmann/json/releases/download/v3.11.3/include.zip
-    URL_HASH SHA256=a22461d13119ac5c78f205d3df1db13403e58ce1bb1794edc9313677313f4a9d
-    PATCH_COMMAND
+# <<<<<<< OLD CODE from 02bdb90 (unknown) - COMMENTED OUT
+#     URL https://github.com/nlohmann/json/releases/download/v3.11.3/include.zip
+#     URL_HASH SHA256=a22461d13119ac5c78f205d3df1db13403e58ce1bb1794edc9313677313f4a9d
+#     PATCH_COMMAND
+# =======
+    URL https://github.com/nlohmann/json/releases/download/v3.12.0/include.zip
+    URL_HASH SHA256=b8cb0ef2dd7f57f18933997c9934bb1fa962594f701cd5a8d3c2c80541559372
+  PATCH_COMMAND
+# >>>>>>> END NEW CODE (unknown)
     ${CMAKE_COMMAND}
       -D "CUDA_VERSION=${CMAKE_HIP_COMPILER_VERSION}"
       -D "CXX_VERSION=${CMAKE_CXX_COMPILER_VERSION}"
