@@ -38,6 +38,12 @@ set(cmake_opts
   -D "CMAKE_CUDA_ARCHITECTURES=${arches}"
 )
 
+# NOTE(HIP/AMD): Some OSes use lib64 instead of lib, so we need
+# to use CMAKE_INSTALL_LIBDIR to get the correct path for the install
+# tree export test.
+include(GNUInstallDirs)
+set(install_lib_dir "${CMAKE_INSTALL_LIBDIR}")
+
 # Temporary installation prefix for tests against installed nvbench:
 set(tmp_install_prefix "${CMAKE_CURRENT_BINARY_DIR}/test_nvbench_install")
 
@@ -81,7 +87,7 @@ nvbench_add_compile_test(test_name
   test_export
   install_tree
   # "rapids_export() always installs to lib" per rapids_export docs
-  -D "NVBench_DIR=${tmp_install_prefix}/lib/cmake/nvbench/"
+  -D "NVBench_DIR=${tmp_install_prefix}/${install_lib_dir}/cmake/nvbench/"
   -D "libhipcxx_DIR=${tmp_install_prefix}/lib/rapids/cmake/libhipcxx/"
   -D TEST_TYPE=INSTALL_TREE
 )
