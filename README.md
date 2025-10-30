@@ -19,10 +19,6 @@
 
 # Overview
 
-> [!CAUTION] 
-> This release is an *early-access* software technology preview. Running production workloads is *not* recommended.
-***
-
 > [!NOTE]
 > This README is derived from the original nvbench project's README. More care is necessary to remove/modify parts that are only applicable to the original version.
 
@@ -57,9 +53,9 @@ features:
 # Supported Compilers and Tools
 
 - CMake > 2.23.1
-- ROCm >= 6.3.2
+- ROCm >= 7.0.0
 - g++: 7 -> 12
-- clang++: 9 -> 18
+- clang++: 9 -> 20
 - cl.exe: 2019 -> 2022 (19.29, 29.39)
 - Headers are tested with C++17 -> C++20.
 
