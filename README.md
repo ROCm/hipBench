@@ -53,7 +53,7 @@ features:
 # Supported Compilers and Tools
 
 - CMake > 2.23.1
-- ROCm >= 7.0.0
+- ROCm == 7.0.2
 - g++: 7 -> 12
 - clang++: 9 -> 20
 - cl.exe: 2019 -> 2022 (19.29, 29.39)
