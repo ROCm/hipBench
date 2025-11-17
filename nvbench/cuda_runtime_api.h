@@ -52,6 +52,12 @@
 #endif
 
 // Simple hipification mappings
+#ifndef cudaDevAttrClockRate
+#  define cudaDevAttrClockRate hipDeviceAttributeClockRate
+#endif
+#ifndef cudaDevAttrMemoryClockRate
+#  define cudaDevAttrMemoryClockRate hipDeviceAttributeMemoryClockRate
+#endif
 #ifndef cudaArray_const_t
 #  define cudaArray_const_t hipArray_const_t
 #endif
