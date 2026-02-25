@@ -18,7 +18,7 @@
 
 // MIT License
 //
-// Modifications Copyright (C) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
+// Modifications Copyright (C) 2023-2026 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -53,8 +53,6 @@
 #include <nvbench/launch.cuh>
 #include <nvbench/stopping_criterion.cuh>
 #include <nvbench/types.cuh>
-
-#include <cuda_runtime.h>
 
 #include <nvbench/cuda_runtime.h>
 
