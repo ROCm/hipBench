@@ -68,6 +68,7 @@ macro(nvbench_generate_exports)
       GLOBAL_TARGETS nvbench main ctl internal_build_interface
       LANGUAGES HIP CXX
       FINAL_CODE_BLOCK nvbench_install_export_code_block
+      PROJECT_COMPONENT devel
     )
 
     # hipbench package provides hipbench:: and nvbench:: targets
@@ -101,6 +102,7 @@ macro(nvbench_generate_exports)
       GLOBAL_TARGETS ${hipbench_global_targets}
       LANGUAGES HIP CXX
       FINAL_CODE_BLOCK nvbench_install_export_code_block
+      PROJECT_COMPONENT devel
     )
   endif()
 endmacro()

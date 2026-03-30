@@ -27,6 +27,41 @@ set(CPACK_OUTPUT_FILE_PREFIX "dist" CACHE PATH "Package output file prefix.")
 set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
 set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
 set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
-set(CPACK_DEBIAN_FILE_NAME DEB-DEFAULT)
 set(CPACK_PACKAGING_INSTALL_PREFIX "/opt/rocm-ds" CACHE PATH "Package install prefix.")
+
+# Enable component-based packaging
+set(CPACK_COMPONENTS_ALL main devel)
+
+# Component descriptions
+set(CPACK_COMPONENT_MAIN_DISPLAY_NAME "hipBench Runtime")
+set(CPACK_COMPONENT_MAIN_DESCRIPTION "hipBench runtime libraries and executables")
+set(CPACK_COMPONENT_DEVEL_DISPLAY_NAME "hipBench Development Files")
+set(CPACK_COMPONENT_DEVEL_DESCRIPTION "Headers and CMake files for developing with hipBench")
+set(CPACK_COMPONENT_DEVEL_DEPENDS main)
+
+# DEB-specific component packaging
+set(CPACK_DEB_COMPONENT_INSTALL ON)
+set(CPACK_DEBIAN_ENABLE_COMPONENT_DEPENDS ON)
+set(CPACK_DEBIAN_FILE_NAME DEB-DEFAULT)
+set(CPACK_DEBIAN_MAIN_PACKAGE_NAME "${CPACK_PACKAGE_NAME}")
+set(CPACK_DEBIAN_DEVEL_PACKAGE_NAME "${CPACK_PACKAGE_NAME}-dev")
+set(debian_devel_dependencies "hipbench = ${CPACK_PACKAGE_VERSION}")
+if (NOT NVBench_INSTALL_CPM_DEPS OR NOT libhipcxx_ADDED)
+  list(APPEND debian_devel_dependencies "libhipcxx-dev >= 2.7.0")
+endif()
+set(CPACK_DEBIAN_DEVEL_PACKAGE_DEPENDS "${debian_devel_dependencies}")
+
+# RPM-specific component packaging
+set(CPACK_RPM_COMPONENT_INSTALL ON)
+set(CPACK_RPM_FILE_NAME RPM-DEFAULT)
+set(CPACK_RPM_MAIN_PACKAGE_NAME "${CPACK_PACKAGE_NAME}")
+set(CPACK_RPM_DEVEL_PACKAGE_NAME "${CPACK_PACKAGE_NAME}-devel")
+set(CPACK_RPM_MAIN_PACKAGE_SUMMARY "hipBench runtime libraries and executables")
+set(CPACK_RPM_DEVEL_PACKAGE_SUMMARY "hipBench development files")
+set(CPACK_RPM_DEVEL_PACKAGE_REQUIRES "${CPACK_PACKAGE_NAME} = ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
+if (NOT NVBench_INSTALL_CPM_DEPS OR NOT libhipcxx_ADDED)
+  list(APPEND rpm_devel_dependencies "libhipcxx-devel >= 2.7.0")
+endif()
+set(CPACK_RPM_DEVEL_PACKAGE_DEPENDS "${rpm_devel_dependencies}")
+
 include(CPack)

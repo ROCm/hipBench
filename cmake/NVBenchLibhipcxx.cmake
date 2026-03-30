@@ -39,10 +39,30 @@ function(find_and_configure_libhipcxx)
   include(${rapids-cmake-dir}/cpm/libhipcxx.cmake)
 
   set(export_sets BUILD_EXPORT_SET nvbench-targets)
-  if(NOT ${NVBench_DISABLE_INSTALL_CPM_DOWNLOADS})
+  if(${NVBench_INSTALL_CPM_DEPS})
+    # note: Only add to BUILD_EXPORT_SET, not INSTALL_EXPORT_SET
+    # This prevents libhipcxx CMake config and includes from being part of the "devel" component package
     list(APPEND export_sets INSTALL_EXPORT_SET nvbench-targets)
   endif()
   rapids_cpm_libhipcxx(${export_sets})
+
+  # We still need to record libhipcxx
+  # as a dependency that should be found via
+  # find_package in the INSTALL config file
+  if (NOT ${NVBench_INSTALL_CPM_DEPS})
+    rapids_export_package(INSTALL
+      libhipcxx
+      nvbench-targets
+      VERSION ${libhipcxx_VERSION}
+      libhipcxx::libhipcxx
+    )
+  endif()
+
+  # Propagate up variables that CPMFindPackage provide
+  set(name libhipcxx)
+  set(${name}_SOURCE_DIR "${${name}_SOURCE_DIR}" PARENT_SCOPE)
+  set(${name}_BINARY_DIR "${${name}_BINARY_DIR}" PARENT_SCOPE)
+  set(${name}_ADDED "${${name}_ADDED}" PARENT_SCOPE)
 
 endfunction()
 

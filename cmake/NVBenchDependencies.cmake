@@ -106,5 +106,5 @@ endif()
 ################################################################################
 # Libhipcxx
 include("${CMAKE_CURRENT_LIST_DIR}/NVBenchLibhipcxx.cmake")
-list(APPEND ctk_libraries libhipcxx::libhipcxx hip::host)
+list(APPEND ctk_libraries libhipcxx::libhipcxx)
 ################################################################################

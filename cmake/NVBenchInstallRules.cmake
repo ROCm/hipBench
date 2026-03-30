@@ -25,34 +25,38 @@ if(NVBench_ENABLE_INSTALL_RULES)
   include(GNUInstallDirs)
   rapids_cmake_install_lib_dir(NVBench_INSTALL_LIB_DIR)
 
-  # in-source public headers:
+  # in-source public headers (devel component):
   install(DIRECTORY "${NVBench_SOURCE_DIR}/nvbench"
     TYPE INCLUDE
+    COMPONENT devel
     FILES_MATCHING
       PATTERN "*.cuh"
       PATTERN "internal" EXCLUDE
   )
 
-  # NOTE(HIP): We need to copy these headers to install directory 
+  # NOTE(HIP): We need to copy these headers to install directory
   # to avoid test nvbench.test.cmake.test_export.install_tree from failing
   install(
     FILES
       "${NVBench_SOURCE_DIR}/nvbench/cuda_runtime.h"
       "${NVBench_SOURCE_DIR}/nvbench/cuda_runtime_api.h"
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/nvbench"
+    COMPONENT devel
   )
 
-  # generated headers from build dir:
+  # generated headers from build dir (devel component):
   install(
     FILES
       "${NVBench_BINARY_DIR}/nvbench/config.cuh"
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/nvbench"
+    COMPONENT devel
   )
   install(
     FILES
       "${NVBench_BINARY_DIR}/nvbench/detail/version.cuh"
       "${NVBench_BINARY_DIR}/nvbench/detail/git_revision.cuh"
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/nvbench/detail"
+    COMPONENT devel
   )
 
   #
@@ -69,6 +73,7 @@ if(NVBench_ENABLE_INSTALL_RULES)
       FILES
         "${NVBench_SOURCE_DIR}/cmake/NVBenchNVML.cmake"
       DESTINATION "${config_install_location}"
+      COMPONENT devel
     )
   endif()
 
@@ -77,23 +82,28 @@ if(NVBench_ENABLE_INSTALL_RULES)
       FILES
         "${NVBench_SOURCE_DIR}/cmake/NVBenchCUPTI.cmake"
       DESTINATION "${config_install_location}"
+      COMPONENT devel
     )
   endif()
 endif()
 
-# Call with a list of library targets to generate install rules:
+# Call with a list of library targets to generate install rules (main component):
 function(nvbench_install_libraries)
   if(NVBench_ENABLE_INSTALL_RULES)
     install(TARGETS ${ARGN}
       DESTINATION "${NVBench_INSTALL_LIB_DIR}"
       EXPORT nvbench-targets
+      COMPONENT main
     )
   endif()
 endfunction()
 
-# Call with a list of executables to generate install rules:
+# Call with a list of executables to generate install rules (main component):
 function(nvbench_install_executables)
   if(NVBench_ENABLE_INSTALL_RULES)
-    install(TARGETS ${ARGN} EXPORT nvbench-targets)
+    install(TARGETS ${ARGN}
+      EXPORT nvbench-targets
+      COMPONENT main
+    )
   endif()
 endfunction()

@@ -82,3 +82,20 @@ add_test(NAME nvbench.test.cmake.install_tree.cleanup
 set_tests_properties(nvbench.test.cmake.install_tree.cleanup PROPERTIES
   FIXTURES_CLEANUP install_tree
 )
+
+if (NOT NVBench_INSTALL_CPM_DEPS)
+  message(WARNING "NVBench_INSTALL_CPM_DEPS is OFF, disabling test nvbench.test.cmake.install_tree.install*")
+  # note: this test requires that hipbench is installed
+  #       together with its CPM dependencies.
+  # note: ${test_name} is set by nvbench_add_compile_test
+  foreach(_name IN ITEMS "${test_name}"
+    "nvbench.test.cmake.install_tree.install"
+    "nvbench.test.cmake.install_tree.cleanup"
+  )
+    set_tests_properties(${_name} PROPERTIES
+      DISABLED True
+      LABELS "SKIPPED: requires installation of CPM dependencies (libhipcxx)"
+    )
+  endforeach()
+endif()
+
