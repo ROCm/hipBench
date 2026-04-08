@@ -24,6 +24,8 @@
 
 #include <fmt/format.h>
 
+#include <iostream>
+
 #include "test_asserts.cuh"
 
 // Mock up a benchmark for testing:
@@ -792,6 +794,18 @@ void test_termination_criteria()
 int main()
 try
 {
+  // If not enough devices are available we skip the test
+  // and print a message that can be parsed by ctest
+  // to mark the test as skipped instead of failed.
+  int num_devs = 0;
+  NVBENCH_CUDA_CALL(cudaGetDeviceCount(&num_devs));
+  if (num_devs < 3)
+  {
+    std::cerr << "SKIPPED: This test requires at least 3 devices, but only " << num_devs
+              << " are available." << std::endl;
+    return 0;
+  }
+
   test_empty();
   test_single_state();
   test_basic();
