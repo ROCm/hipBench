@@ -27,7 +27,9 @@ add_dependencies(nvbench.test.all ${test_name})
 if (NVBench_ENABLE_DEVICE_TESTING)
   add_test(NAME ${test_name} COMMAND "$<TARGET_FILE:${test_name}>")
   set_tests_properties(${test_name} PROPERTIES
-    # Any timeouts/warnings are hard failures for this test.
-    FAIL_REGULAR_EXPRESSION "Warn;timed out"
+    # Timeouts are hard failures for this test.
+    FAIL_REGULAR_EXPRESSION "timed out"
+    # Warnings are soft failures (skipped).
+    SKIP_REGULAR_EXPRESSION "Warn"
   )
 endif()

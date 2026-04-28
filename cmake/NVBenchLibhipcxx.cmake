@@ -29,7 +29,68 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-# Use CPM to find or clone libhipcxx
+# ---------------------------------------------------------------------------
+# find_and_configure_libhipcxx
+#
+# Uses rapids_cpm_libhipcxx to fetch libhipcxx, then applies a post-fetch
+# patch to include/hip/std/detail/__config that adds
+# _LIBCUDACXX_HIP_TSC_CLOCKRATE definitions for GPU architectures missing
+# from libhipcxx 1.9.0:
+#
+#   gfx950        AMD Instinct MI350 / MI355X  (CDNA4)
+#   gfx1101/1102  Radeon RX 7000 series        (RDNA3 variants)
+#   gfx1200/1201  Radeon R9700 / R9700 XT      (RDNA4)
+#   <others>      generic 100 MHz fallback
+#
+# Without this patch, building for any of the above targets fails with:
+#   error: use of undeclared identifier '_LIBCUDACXX_HIP_TSC_CLOCKRATE'
+#
+# The patch logic lives in patch_libhipcxx_config.py (same directory).
+# ---------------------------------------------------------------------------
+
+set(_NVBENCH_PATCH_SCRIPT "${CMAKE_CURRENT_LIST_DIR}/patch_libhipcxx_config.py")
+set(_LIBHIPCXX_CONFIG_RELPATH "include/hip/std/detail/__config")
+
+# Apply the TSC patch to the given libhipcxx source directory (idempotent).
+function(_nvbench_patch_libhipcxx_config src_dir)
+  set(config_file "${src_dir}/${_LIBHIPCXX_CONFIG_RELPATH}")
+  if(NOT EXISTS "${config_file}")
+    message(WARNING
+      "NVBenchLibhipcxx: ${config_file} not found — skipping TSC patch")
+    return()
+  endif()
+
+  find_package(Python3 QUIET COMPONENTS Interpreter)
+  if(Python3_FOUND)
+    set(_py "${Python3_EXECUTABLE}")
+  else()
+    find_program(_py NAMES python3 python)
+  endif()
+
+  if(NOT _py)
+    message(WARNING
+      "NVBenchLibhipcxx: Python3 not found — TSC patch not applied.\n"
+      "  Run manually: python3 ${_NVBENCH_PATCH_SCRIPT} ${config_file}")
+    return()
+  endif()
+
+  execute_process(
+    COMMAND "${_py}" "${_NVBENCH_PATCH_SCRIPT}" "${config_file}"
+    RESULT_VARIABLE _result
+    OUTPUT_VARIABLE _output
+    ERROR_VARIABLE  _error
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
+  if(NOT _result EQUAL 0)
+    message(FATAL_ERROR
+      "NVBenchLibhipcxx: TSC patch failed:\n${_error}")
+  endif()
+  message(STATUS "${_output}")
+endfunction()
+
+# ---------------------------------------------------------------------------
+# Main entry point
+# ---------------------------------------------------------------------------
 function(find_and_configure_libhipcxx)
   include(${rapids-cmake-dir}/cpm/libhipcxx.cmake)
 
@@ -37,6 +98,21 @@ function(find_and_configure_libhipcxx)
     BUILD_EXPORT_SET nvbench-targets
     INSTALL_EXPORT_SET nvbench-targets
   )
+
+  # libhipcxx_SOURCE_DIR is exported by rapids_cpm_libhipcxx / CPM.
+  if(DEFINED libhipcxx_SOURCE_DIR AND EXISTS "${libhipcxx_SOURCE_DIR}")
+    _nvbench_patch_libhipcxx_config("${libhipcxx_SOURCE_DIR}")
+  else()
+    # Fallback: probe common CPM / FetchContent cache locations.
+    foreach(_candidate
+        "${CMAKE_BINARY_DIR}/_deps/libhipcxx-src"
+        "${FETCHCONTENT_BASE_DIR}/libhipcxx-src")
+      if(EXISTS "${_candidate}/${_LIBHIPCXX_CONFIG_RELPATH}")
+        _nvbench_patch_libhipcxx_config("${_candidate}")
+        break()
+      endif()
+    endforeach()
+  endif()
 
 endfunction()
 
