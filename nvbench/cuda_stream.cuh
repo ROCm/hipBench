@@ -59,16 +59,14 @@ namespace nvbench
 struct hip_stream
 {
   /**
-   * Constructs a hip_stream that owns a new stream, created with
-   * `hipStreamCreate`.
+   * Constructs a hip_stream that owns a new stream, created lazily on first
+   * use with `hipStreamCreate`. Lazy creation ensures the stream is allocated
+   * on the device that is active at the time of first access, not at
+   * construction time.
    */
   hip_stream()
-      : m_stream{[]() {
-                   hipStream_t s;
-                   NVBENCH_CUDA_CALL(hipStreamCreate(&s));
-                   return s;
-                 }(),
-                 stream_deleter{true}}
+      : m_stream{nullptr, stream_deleter{true}}
+      , m_initialized{false}
   {}
 
   /**
@@ -81,6 +79,7 @@ struct hip_stream
    */
   hip_stream(hipStream_t stream, bool owning)
       : m_stream{stream, stream_deleter{owning}}
+      , m_initialized{true}
   {}
 
   ~hip_stream() = default;
@@ -95,9 +94,19 @@ struct hip_stream
    * @return The `hipStream_t` managed by this `hip_stream`.
    * @{
    */
-  operator hipStream_t() const { return m_stream.get(); }
+  operator hipStream_t() const { return get_stream(); }
 
-  hipStream_t get_stream() const { return m_stream.get(); }
+  hipStream_t get_stream() const
+  {
+    if (!m_initialized)
+    {
+      hipStream_t s;
+      NVBENCH_CUDA_CALL(hipStreamCreate(&s));
+      m_stream.reset(s);
+      m_initialized = true;
+    }
+    return m_stream.get();
+  }
   /**@}*/
 
 private:
@@ -108,14 +117,15 @@ private:
 
     constexpr void operator()(pointer s) const noexcept
     {
-      if (owning)
+      if (owning && s)
       {
         NVBENCH_CUDA_CALL_NOEXCEPT(hipStreamDestroy(s));
       }
     }
   };
 
-  std::unique_ptr<hipStream_t, stream_deleter> m_stream;
+  mutable std::unique_ptr<hipStream_t, stream_deleter> m_stream;
+  mutable bool m_initialized;
 };
 
 /**
