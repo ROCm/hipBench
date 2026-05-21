@@ -72,10 +72,10 @@ macro(nvbench_load_rapids_cmake)
   include(rapids-export)
   include(rapids-find)
 
-  # prescribe versions of internal dependencies
+  # prescribe versions of internal dependencies (overrides rapids-cmake defaults
+  # for packages we want to pin to a specific version, e.g. libhipcxx 3.2.0)
   include(cpm/package_override)
-  # message(STATUS ${CMAKE_CURRENT_LIST_DIR})
-  rapids_cpm_package_override(${CMAKE_CURRENT_LIST_DIR}/versions.json)
+  rapids_cpm_package_override(${CMAKE_SOURCE_DIR}/versions.json)
 
   rapids_hip_init_architectures(NVBench)
 endmacro()
