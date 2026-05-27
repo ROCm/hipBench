@@ -81,8 +81,21 @@ if (UNIX)
   #: set_property(TEST test_bench PROPERTY
   #:   ENVIRONMENT "LD_LIBRARY_PATH=${cupti_lib_path}"
   #: )
+
+  # Need to add the HIP runtime path (libamdhip64.so.N) to LD_LIBRARY_PATH.
+  # CMake's TEST ENVIRONMENT property REPLACES LD_LIBRARY_PATH rather than
+  # appending, so the inherited value (set by /etc/profile.d/set-rocm-env.sh
+  # on TheRock installs) is wiped. On apt/dnf ROCm installs the loader's
+  # ldconfig cache rescues us, but TheRock from-tarball installs do not
+  # register /opt/rocm/lib with ldconfig, so the load fails. Adding the
+  # HIP path back explicitly fixes TheRock and is a no-op on apt/dnf ROCm.
+  set(hip_lib_path "$ENV{ROCM_PATH}/lib")
+  if(NOT EXISTS "${hip_lib_path}")
+    set(hip_lib_path "/opt/rocm/lib")
+  endif()
+
   set_property(TEST nvbench_ctl PROPERTY
-    ENVIRONMENT "LD_LIBRARY_PATH=${ctl_lib_path}:${cupti_lib_path}"
+    ENVIRONMENT "LD_LIBRARY_PATH=${ctl_lib_path}:${cupti_lib_path}:${hip_lib_path}"
   )
 
 endif()
