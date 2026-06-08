@@ -2,7 +2,6 @@
   "packages" : {
     "libhipcxx" : {
       "version" : "3.2.0",
-      "git_url" : "https://github.com/AMD-AIOSS/libhipcxx",
       "git_tag" : "upgrade/3.2_base_enable"
     }
   }
