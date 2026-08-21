@@ -1,8 +1,5 @@
 {
   "packages" : {
-    "libhipcxx" : {
-      "version" : "3.2.0",
-      "git_tag" : "upgrade/3.2_base_enable"
-    }
+    
   }
 }
