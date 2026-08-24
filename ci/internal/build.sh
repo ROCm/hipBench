@@ -54,6 +54,9 @@
 #                                 resolves to CONDA_PREFIX.
 #   CPACK_PACKAGING_INSTALL_PREFIX  Prefix baked into the packages. Defaults to
 #                                 CMAKE_INSTALL_PREFIX.
+#   RAPIDS_CMAKE_MODULE_PATH      Where the rocmds-cmake modules live, either an
+#                                 installed package or a source checkout; when
+#                                 set, they are used instead of a download.
 #   AMDGPU_TARGETS                GPU architectures to compile for.
 #   SCCACHE_ENABLE                'true' enables the sccache launchers.
 #   CMAKE_VERSION                 When set, cmake of that version is installed
