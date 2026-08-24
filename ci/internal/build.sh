@@ -27,6 +27,8 @@
 # Required environment variables:
 #   SRC_DIR              Parent directory of the project checkout.
 #   BUILD_DIR            Scratch directory for the build tree.
+#   INSTALL_DIR          Prefix the install step targets and the packages are
+#                        built for.
 #   BUILD_ARTIFACTS_DIR  Destination for packages and the tests tarball.
 #
 # Optional environment variables:
@@ -50,10 +52,11 @@
 #   HIPBENCH_CPACK_GENERATORS     Semicolon separated CPack generator list.
 #                                 Defaults to the generators whose backend is
 #                                 present (RPM and/or DEB).
-#   CMAKE_INSTALL_PREFIX          Install prefix; the literal '<conda-prefix>'
-#                                 resolves to CONDA_PREFIX.
+#   CMAKE_INSTALL_PREFIX          Install prefix, overriding INSTALL_DIR; the
+#                                 literal '<conda-prefix>' resolves to
+#                                 CONDA_PREFIX.
 #   CPACK_PACKAGING_INSTALL_PREFIX  Prefix baked into the packages. Defaults to
-#                                 CMAKE_INSTALL_PREFIX.
+#                                 the install prefix.
 #   RAPIDS_CMAKE_MODULE_PATH      Where the rocmds-cmake modules live, either an
 #                                 installed package or a source checkout; when
 #                                 set, they are used instead of a download.
@@ -68,6 +71,7 @@ set -xeu
 
 : "${SRC_DIR:?SRC_DIR must be set}"
 : "${BUILD_DIR:?BUILD_DIR must be set}"
+: "${INSTALL_DIR:?INSTALL_DIR must be set}"
 : "${BUILD_ARTIFACTS_DIR:?BUILD_ARTIFACTS_DIR must be set}"
 
 PROJECT_ID="${PROJECT_ID:-hipbench}"
@@ -141,10 +145,11 @@ if [ -n "${install_to_conda_prefix:-}" ]; then
     "-D CPACK_PACKAGING_INSTALL_PREFIX=${CONDA_PREFIX}"
   )
 else
-  package_prefix="${CPACK_PACKAGING_INSTALL_PREFIX:-${CMAKE_INSTALL_PREFIX:-}}"
+  install_prefix="${CMAKE_INSTALL_PREFIX:-${INSTALL_DIR}}"
+  package_prefix="${CPACK_PACKAGING_INSTALL_PREFIX:-${install_prefix}}"
   cmake_args+=(
-    ${CMAKE_INSTALL_PREFIX:+"-D CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}"}
-    ${package_prefix:+"-D CPACK_PACKAGING_INSTALL_PREFIX=${package_prefix}"}
+    "-D CMAKE_INSTALL_PREFIX=${install_prefix}"
+    "-D CPACK_PACKAGING_INSTALL_PREFIX=${package_prefix}"
   )
 fi
 
