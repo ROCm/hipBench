@@ -62,8 +62,10 @@
 #                                 set, they are used instead of a download.
 #   AMDGPU_TARGETS                GPU architectures to compile for.
 #   SCCACHE_ENABLE                'true' enables the sccache launchers.
-#   CMAKE_VERSION                 When set, cmake of that version is installed
-#                                 into a venv under BUILD_DIR.
+#   CMAKE_VERSION                 Version of the cmake package to install into
+#                                 the venv under BUILD_DIR that supplies cmake,
+#                                 cpack and ctest. Unset means whatever cmake is
+#                                 on PATH, e.g. from a conda environment.
 #   ROCM_PATH, CMAKE_PREFIX_PATH
 #   CMAKE_BUILD_PARALLEL_LEVEL, MAX_JOBS   Build parallelism.
 
@@ -167,13 +169,15 @@ cp -R ${src_dir} ${build_src_dir}
 
 mkdir -p ${BUILD_ARTIFACTS_DIR}
 
-# The pipeline pins cmake per build; the Docker images ship their own.
+# cmake, cpack and ctest come from this venv.
 if [ -n "${CMAKE_VERSION:-}" ]; then
+  python3 --version
   python3 -m venv ${build_src_dir}/_venv
   . ${build_src_dir}/_venv/bin/activate
   pip3 install --upgrade pip
-  pip3 install cmake==${CMAKE_VERSION}
+  pip3 install "cmake==${CMAKE_VERSION}"
 fi
+cmake --version && cpack --version && ctest --version
 
 #### build, package, install
 
@@ -201,4 +205,7 @@ du -sh ${BUILD_ARTIFACTS_DIR}/${tests_tarball_name}
 # inspect package contents
 if command -v dpkg >/dev/null 2>&1; then
   find ${BUILD_ARTIFACTS_DIR} -name "*.deb" -exec echo "{}:" \; -exec dpkg -c {} \;
+fi
+if command -v rpm >/dev/null 2>&1; then
+  find ${BUILD_ARTIFACTS_DIR} -name "*.rpm" -exec echo "{}:" \; -exec rpm -qlp {} \;
 fi
