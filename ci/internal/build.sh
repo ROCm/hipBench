@@ -52,6 +52,9 @@
 #   HIPBENCH_CPACK_GENERATORS     Semicolon separated CPack generator list.
 #                                 Defaults to the generators whose backend is
 #                                 present (RPM and/or DEB).
+#   CI_INTERNAL_CREATE_TESTS_TARBALL
+#                                 '1' packs the tests tarball the tester images
+#                                 consume (default: 0).
 #   CMAKE_INSTALL_PREFIX          Install prefix, overriding INSTALL_DIR; the
 #                                 literal '<conda-prefix>' resolves to
 #                                 CONDA_PREFIX.
@@ -92,6 +95,11 @@ fi
 # nothing; default to a full install.
 components="${HIPBENCH_INSTALL_COMPONENTS-}"
 tests_tarball_name="${PROJECT_ID}-tests.tar.gz"
+
+case "${CI_INTERNAL_CREATE_TESTS_TARBALL:-0}" in
+  1 | true | yes | on) create_tests_tarball="1" ;;
+  *) create_tests_tarball="" ;;
+esac
 
 [[ "${CMAKE_INSTALL_PREFIX:-}" == "<conda-prefix>" ]] && install_to_conda_prefix="1"
 [[ "${SCCACHE_ENABLE:-false}" == "true" ]] && use_sccache=1
@@ -205,13 +213,15 @@ fi
 # test_export project, cmake/ for the modules the build-tree export includes.
 # Only ci/ is needed from the checkout itself. .git is excluded because the
 # build tree can hold CPM clones.
-tar --exclude=.git -czvf ${BUILD_ARTIFACTS_DIR}/${tests_tarball_name} \
-  ${build_build_dir} \
-  ${build_src_dir}/nvbench \
-  ${build_src_dir}/cmake \
-  ${build_src_dir}/testing/cmake \
-  ${src_dir}/ci
-du -sh ${BUILD_ARTIFACTS_DIR}/${tests_tarball_name}
+if [ -n "${create_tests_tarball:-}" ]; then
+  tar --exclude=.git -czvf ${BUILD_ARTIFACTS_DIR}/${tests_tarball_name} \
+    ${build_build_dir} \
+    ${build_src_dir}/nvbench \
+    ${build_src_dir}/cmake \
+    ${build_src_dir}/testing/cmake \
+    ${src_dir}/ci
+  du -sh ${BUILD_ARTIFACTS_DIR}/${tests_tarball_name}
+fi
 
 # inspect package contents
 if command -v dpkg >/dev/null 2>&1; then
