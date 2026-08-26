@@ -55,12 +55,23 @@ nvbench_add_compile_test(test_name
 ################################################################################
 # Test against install tree export
 
+# libhipcxx either rides along in the install tree, or the environment provides
+# it as a package that find_package has to resolve.
+set(install_tree_libhipcxx_args)
+if (NVBench_INSTALL_CPM_DEPS AND libhipcxx_ADDED)
+  list(APPEND install_tree_libhipcxx_args
+    -D "libhipcxx_DIR=${tmp_install_prefix}/lib/rapids/cmake/libhipcxx/"
+  )
+elseif (DEFINED libhipcxx_DIR)
+  list(APPEND install_tree_libhipcxx_args -D "libhipcxx_DIR=${libhipcxx_DIR}")
+endif()
+
 nvbench_add_compile_test(test_name
   test_export
   install_tree
   # "rapids_export() always installs to lib" per rapids_export docs
   -D "NVBench_DIR=${tmp_install_prefix}/${install_lib_dir}/cmake/nvbench/"
-  -D "libhipcxx_DIR=${tmp_install_prefix}/lib/rapids/cmake/libhipcxx/"
+  ${install_tree_libhipcxx_args}
   -D TEST_TYPE=INSTALL_TREE
 )
 set_tests_properties(${test_name} PROPERTIES FIXTURES_REQUIRED install_tree)
@@ -82,20 +93,4 @@ add_test(NAME nvbench.test.cmake.install_tree.cleanup
 set_tests_properties(nvbench.test.cmake.install_tree.cleanup PROPERTIES
   FIXTURES_CLEANUP install_tree
 )
-
-if (NOT NVBench_INSTALL_CPM_DEPS)
-  message(WARNING "NVBench_INSTALL_CPM_DEPS is OFF, disabling test nvbench.test.cmake.install_tree.install*")
-  # note: this test requires that hipbench is installed
-  #       together with its CPM dependencies.
-  # note: ${test_name} is set by nvbench_add_compile_test
-  foreach(_name IN ITEMS "${test_name}"
-    "nvbench.test.cmake.install_tree.install"
-    "nvbench.test.cmake.install_tree.cleanup"
-  )
-    set_tests_properties(${_name} PROPERTIES
-      DISABLED True
-      LABELS "SKIPPED: requires installation of CPM dependencies (libhipcxx)"
-    )
-  endforeach()
-endif()
 
