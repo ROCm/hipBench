@@ -43,12 +43,12 @@
 #                                 'install'. Empty (the default) installs
 #                                 everything, which is what this project's
 #                                 install rules provide.
-#   HIPBENCH_DISABLE_INSTALL_CPM_DOWNLOADS
-#                                 'ON' (the default) keeps CPM-downloaded
+#   HIPBENCH_INSTALL_CPM_DEPS     'OFF' (the default) keeps CPM-resolved
 #                                 dependencies out of the install tree and
-#                                 therefore out of the packages. Set 'OFF' to
-#                                 bundle them, which is what the Docker images
-#                                 shipped before.
+#                                 therefore out of the packages, which then
+#                                 declare them as package dependencies instead.
+#                                 Set 'ON' to bundle them, which is what the
+#                                 Docker images shipped before.
 #   HIPBENCH_CPACK_GENERATORS     Semicolon separated CPack generator list.
 #                                 Defaults to the generators whose backend is
 #                                 present (RPM and/or DEB).
@@ -129,7 +129,7 @@ fi
 
 cmake_args=(
   "-D NVBench_ENABLE_TESTING=ON"
-  "-D NVBench_DISABLE_INSTALL_CPM_DOWNLOADS=${HIPBENCH_DISABLE_INSTALL_CPM_DOWNLOADS:-ON}"
+  "-D NVBench_INSTALL_CPM_DEPS=${HIPBENCH_INSTALL_CPM_DEPS:-OFF}"
   "-D CMAKE_VERBOSE_MAKEFILE=ON"
   "-D CPACK_OUTPUT_FILE_PREFIX=${BUILD_ARTIFACTS_DIR}"
   "-D CPACK_GENERATOR=${cpack_generators}"
