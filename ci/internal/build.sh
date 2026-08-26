@@ -197,9 +197,20 @@ fi
 
 #### test archive
 
-# The tester images extract this at / and drive ci/internal/test.sh out of the
-# source tree it carries, so the archive keeps absolute paths.
-tar --exclude=.git -czvf ${BUILD_ARTIFACTS_DIR}/${tests_tarball_name} ${build_build_dir} ${src_dir}
+# The tester images extract this at / and drive ci/internal/test.sh from the
+# restored paths, so the archive keeps absolute paths. Unlike the other
+# components, this build configures from a copy of the checkout, so the build
+# tree records ${build_src_dir} paths and the tests follow them back: nvbench/
+# for the headers install_tree.install re-copies, testing/cmake for the
+# test_export project, cmake/ for the modules the build-tree export includes.
+# Only ci/ is needed from the checkout itself. .git is excluded because the
+# build tree can hold CPM clones.
+tar --exclude=.git -czvf ${BUILD_ARTIFACTS_DIR}/${tests_tarball_name} \
+  ${build_build_dir} \
+  ${build_src_dir}/nvbench \
+  ${build_src_dir}/cmake \
+  ${build_src_dir}/testing/cmake \
+  ${src_dir}/ci
 du -sh ${BUILD_ARTIFACTS_DIR}/${tests_tarball_name}
 
 # inspect package contents
