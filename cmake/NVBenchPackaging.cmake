@@ -47,11 +47,11 @@ set(CPACK_DEBIAN_ENABLE_COMPONENT_DEPENDS ON)
 set(CPACK_DEBIAN_FILE_NAME DEB-DEFAULT)
 set(CPACK_DEBIAN_MAIN_PACKAGE_NAME "${CPACK_PACKAGE_NAME}")
 set(CPACK_DEBIAN_DEVEL_PACKAGE_NAME "${CPACK_PACKAGE_NAME}-dev")
-set(debian_devel_dependencies "hipbench = ${CPACK_PACKAGE_VERSION}")
+# CPACK_DEBIAN_ENABLE_COMPONENT_DEPENDS derives the dependency on the main
+# package from CPACK_COMPONENT_DEVEL_DEPENDS, so only external ones belong here.
 if (NOT NVBench_INSTALL_CPM_DEPS OR NOT libhipcxx_ADDED)
-  list(APPEND debian_devel_dependencies "libhipcxx-dev >= 2.7.0")
+  set(CPACK_DEBIAN_DEVEL_PACKAGE_DEPENDS "libhipcxx-dev (>= 2.7.0)")
 endif()
-set(CPACK_DEBIAN_DEVEL_PACKAGE_DEPENDS "${debian_devel_dependencies}")
 
 # RPM-specific component packaging
 set(CPACK_RPM_COMPONENT_INSTALL ON)
@@ -60,10 +60,11 @@ set(CPACK_RPM_MAIN_PACKAGE_NAME "${CPACK_PACKAGE_NAME}")
 set(CPACK_RPM_DEVEL_PACKAGE_NAME "${CPACK_PACKAGE_NAME}-devel")
 set(CPACK_RPM_MAIN_PACKAGE_SUMMARY "hipBench runtime libraries and executables")
 set(CPACK_RPM_DEVEL_PACKAGE_SUMMARY "hipBench development files")
-set(CPACK_RPM_DEVEL_PACKAGE_REQUIRES "${CPACK_PACKAGE_NAME} = ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
+set(rpm_devel_requires "${CPACK_PACKAGE_NAME} = ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 if (NOT NVBench_INSTALL_CPM_DEPS OR NOT libhipcxx_ADDED)
-  list(APPEND rpm_devel_dependencies "libhipcxx-devel >= 2.7.0")
+  list(APPEND rpm_devel_requires "libhipcxx-devel >= 2.7.0")
 endif()
-set(CPACK_RPM_DEVEL_PACKAGE_DEPENDS "${rpm_devel_dependencies}")
+# rpm spells this out comma separated, so a bare CMake list would not do
+list(JOIN rpm_devel_requires ", " CPACK_RPM_DEVEL_PACKAGE_REQUIRES)
 
 include(CPack)
