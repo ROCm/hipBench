@@ -56,14 +56,16 @@ features:
 Check out [this talk](https://www.youtube.com/watch?v=CtrqBmYtSEk) for an overview
 of the challenges inherent to CUDA kernel benchmarking and how NVBench solves them for you!
 
-# Supported Compilers and Tools
+# Supported Platforms
 
-- CMake > 3.30.4
-- ROCm == 7.0.2
-- g++: 7 -> 12
-- clang++: 9 -> 20
-- cl.exe: 2019 -> 2022 (19.29, 29.39)
-- Headers are tested with C++17 -> C++20.
+- This release of hipBench has been successfully tested on AMD GPUs with
+  ROCm 7.2.3.
+- The following architectures have been tested successfully for this release:
+  - gfx90a (MI210X/MI250)
+  - gfx942 (MI300X/MI325X)
+  - gfx950 (MI355X)
+- hipBench is built using CMake 3.30.4 or higher and requires a C++17
+  compliant compiler.
 
 # Known limitations
 
